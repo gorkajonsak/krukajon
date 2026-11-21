@@ -6,8 +6,21 @@
   <meta name="mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="theme-color" content="#4F46E5">
+  <meta name="description" content="เกมการเรียนรู้วิทยาการคำนวณ ม.1 - ม.3 ฝึกออกแบบผังงานแบบมีเงื่อนไข (IF-THEN, AND, OR) และชนิดข้อมูลด้วย Flowgorithm">
+  
+  <!-- Open Graph / Facebook / LINE -->
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="ผจญภัยเมืองผังงาน Flowgorithm (Flowgorithm IF-THEN Adventure)">
+  <meta property="og:description" content="เกมการเรียนรู้วิทยาการคำนวณ ม.1 - ม.3 เล่นได้บนโทรศัพท์และคอมพิวเตอร์อย่างลื่นไหล">
+  
+  <!-- PWA Manifest & App Icon -->
+  <link rel="manifest" href="manifest.json">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>💻</text></svg>">
+  <link rel="apple-touch-icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>💻</text></svg>">
+
   <title>ผจญภัยเมืองผังงาน Flowgorithm (Flowgorithm IF-THEN Adventure) - ม.1 ถึง ม.3</title>
-  <!-- Google Fonts: Mali -->
+  <!-- Google Fonts: Mali & Prompt -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Mali:ital,wght@0,300;0,400;0,600;0,700;1,400&family=Prompt:wght@400;600;700&display=swap" rel="stylesheet">
@@ -1171,6 +1184,7 @@
           <span>⭐</span>
           <span id="hud-score">0</span>
         </div>
+        <button id="btn-fullscreen" class="hud-btn" title="ขยายเต็มจอ">⛶</button>
         <button id="btn-sound-toggle" class="hud-btn" title="เปิด/ปิดเสียง">🔊</button>
       </div>
     </div>
@@ -1461,208 +1475,250 @@
       constructor() {
         this.ctx = null;
         this.isMuted = false;
+        try {
+          const saved = localStorage.getItem('flowgorithm_sound_muted');
+          if (saved !== null) this.isMuted = saved === 'true';
+        } catch (e) {}
       }
 
       init() {
-        if (!this.ctx) {
-          const AudioContextClass = window.AudioContext || window.webkitAudioContext;
-          if (AudioContextClass) {
-            this.ctx = new AudioContextClass();
+        try {
+          if (!this.ctx) {
+            const AudioContextClass = window.AudioContext || window.webkitAudioContext;
+            if (AudioContextClass) {
+              this.ctx = new AudioContextClass();
+            }
           }
-        }
-        if (this.ctx && this.ctx.state === 'suspended') {
-          this.ctx.resume();
-        }
+          if (this.ctx && this.ctx.state !== 'running') {
+            this.ctx.resume().catch(() => {});
+          }
+        } catch (e) {}
       }
 
       toggleMute() {
         this.isMuted = !this.isMuted;
+        try {
+          localStorage.setItem('flowgorithm_sound_muted', this.isMuted);
+        } catch (e) {}
         return !this.isMuted;
       }
 
       // Jump: rising frequency sine sweep
       playJump() {
         if (this.isMuted || !this.ctx) return;
-        const now = this.ctx.currentTime;
-        const osc = this.ctx.createOscillator();
-        const gain = this.ctx.createGain();
+        try {
+          const now = this.ctx.currentTime;
+          const osc = this.ctx.createOscillator();
+          const gain = this.ctx.createGain();
 
-        osc.type = 'sine';
-        osc.frequency.setValueAtTime(140, now);
-        osc.frequency.exponentialRampToValueAtTime(420, now + 0.14);
+          osc.type = 'sine';
+          osc.frequency.setValueAtTime(140, now);
+          osc.frequency.exponentialRampToValueAtTime(420, now + 0.14);
 
-        gain.gain.setValueAtTime(0.3, now);
-        gain.gain.linearRampToValueAtTime(0.01, now + 0.14);
+          gain.gain.setValueAtTime(0.3, now);
+          gain.gain.linearRampToValueAtTime(0.01, now + 0.14);
 
-        osc.connect(gain);
-        gain.connect(this.ctx.destination);
+          osc.connect(gain);
+          gain.connect(this.ctx.destination);
 
-        osc.start(now);
-        osc.stop(now + 0.15);
+          osc.start(now);
+          osc.stop(now + 0.15);
+        } catch (e) {}
       }
 
       // Crystal pickup: bright sparkling chime arpeggio
       playCrystal() {
         if (this.isMuted || !this.ctx) return;
-        const notes = [523.25, 659.25, 783.99, 1046.50]; // C5, E5, G5, C6
-        notes.forEach((freq, idx) => {
-          const now = this.ctx.currentTime + idx * 0.05;
-          const osc = this.ctx.createOscillator();
-          const gain = this.ctx.createGain();
+        try {
+          const notes = [523.25, 659.25, 783.99, 1046.50]; // C5, E5, G5, C6
+          notes.forEach((freq, idx) => {
+            const now = this.ctx.currentTime + idx * 0.05;
+            const osc = this.ctx.createOscillator();
+            const gain = this.ctx.createGain();
 
-          osc.type = 'triangle';
-          osc.frequency.setValueAtTime(freq, now);
+            osc.type = 'triangle';
+            osc.frequency.setValueAtTime(freq, now);
 
-          gain.gain.setValueAtTime(0.25, now);
-          gain.gain.exponentialRampToValueAtTime(0.001, now + 0.2);
+            gain.gain.setValueAtTime(0.25, now);
+            gain.gain.exponentialRampToValueAtTime(0.001, now + 0.2);
 
-          osc.connect(gain);
-          gain.connect(this.ctx.destination);
+            osc.connect(gain);
+            gain.connect(this.ctx.destination);
 
-          osc.start(now);
-          osc.stop(now + 0.22);
-        });
+            osc.start(now);
+            osc.stop(now + 0.22);
+          });
+        } catch (e) {}
       }
 
       // Correct answer fanfare: cheerful major chord progression
       playCorrect() {
         if (this.isMuted || !this.ctx) return;
-        const chords = [
-          { f: 523.25, d: 0.1, t: 0 },     // C5
-          { f: 659.25, d: 0.1, t: 0.08 },  // E5
-          { f: 783.99, d: 0.12, t: 0.16 }, // G5
-          { f: 1046.50, d: 0.35, t: 0.24 } // C6
-        ];
-        chords.forEach(c => {
-          const now = this.ctx.currentTime + c.t;
-          const osc = this.ctx.createOscillator();
-          const gain = this.ctx.createGain();
+        try {
+          const chords = [
+            { f: 523.25, d: 0.1, t: 0 },     // C5
+            { f: 659.25, d: 0.1, t: 0.08 },  // E5
+            { f: 783.99, d: 0.12, t: 0.16 }, // G5
+            { f: 1046.50, d: 0.35, t: 0.24 } // C6
+          ];
+          chords.forEach(c => {
+            const now = this.ctx.currentTime + c.t;
+            const osc = this.ctx.createOscillator();
+            const gain = this.ctx.createGain();
 
-          osc.type = 'sine';
-          osc.frequency.setValueAtTime(c.f, now);
+            osc.type = 'sine';
+            osc.frequency.setValueAtTime(c.f, now);
 
-          gain.gain.setValueAtTime(0.3, now);
-          gain.gain.exponentialRampToValueAtTime(0.001, now + c.d);
+            gain.gain.setValueAtTime(0.3, now);
+            gain.gain.exponentialRampToValueAtTime(0.001, now + c.d);
 
-          osc.connect(gain);
-          gain.connect(this.ctx.destination);
+            osc.connect(gain);
+            gain.connect(this.ctx.destination);
 
-          osc.start(now);
-          osc.stop(now + c.d + 0.05);
-        });
+            osc.start(now);
+            osc.stop(now + c.d + 0.05);
+          });
+        } catch (e) {}
       }
 
       // Wrong answer buzzer: low dissonant sawtooth sound
       playWrong() {
         if (this.isMuted || !this.ctx) return;
-        const now = this.ctx.currentTime;
-        const osc = this.ctx.createOscillator();
-        const gain = this.ctx.createGain();
-
-        osc.type = 'sawtooth';
-        osc.frequency.setValueAtTime(180, now);
-        osc.frequency.linearRampToValueAtTime(90, now + 0.25);
-
-        gain.gain.setValueAtTime(0.3, now);
-        gain.gain.linearRampToValueAtTime(0.01, now + 0.25);
-
-        osc.connect(gain);
-        gain.connect(this.ctx.destination);
-
-        osc.start(now);
-        osc.stop(now + 0.26);
-      }
-
-      // Boss Hit impact
-      playBossHit() {
-        if (this.isMuted || !this.ctx) return;
-        const now = this.ctx.currentTime;
-        const osc = this.ctx.createOscillator();
-        const gain = this.ctx.createGain();
-
-        osc.type = 'square';
-        osc.frequency.setValueAtTime(260, now);
-        osc.frequency.exponentialRampToValueAtTime(60, now + 0.2);
-
-        gain.gain.setValueAtTime(0.4, now);
-        gain.gain.linearRampToValueAtTime(0.01, now + 0.2);
-
-        osc.connect(gain);
-        gain.connect(this.ctx.destination);
-
-        osc.start(now);
-        osc.stop(now + 0.21);
-      }
-
-      // Victory fanfare
-      playVictory() {
-        if (this.isMuted || !this.ctx) return;
-        const notes = [440, 554, 659, 880, 1108];
-        notes.forEach((freq, idx) => {
-          const now = this.ctx.currentTime + idx * 0.12;
+        try {
+          const now = this.ctx.currentTime;
           const osc = this.ctx.createOscillator();
           const gain = this.ctx.createGain();
 
-          osc.type = 'triangle';
-          osc.frequency.setValueAtTime(freq, now);
+          osc.type = 'sawtooth';
+          osc.frequency.setValueAtTime(180, now);
+          osc.frequency.linearRampToValueAtTime(90, now + 0.25);
 
-          gain.gain.setValueAtTime(0.35, now);
-          gain.gain.exponentialRampToValueAtTime(0.001, now + 0.4);
+          gain.gain.setValueAtTime(0.3, now);
+          gain.gain.linearRampToValueAtTime(0.01, now + 0.25);
 
           osc.connect(gain);
           gain.connect(this.ctx.destination);
 
           osc.start(now);
-          osc.stop(now + 0.45);
-        });
+          osc.stop(now + 0.26);
+        } catch (e) {}
       }
 
-      // Game Over sound
-      playGameOver() {
+      // Boss Hit impact
+      playBossHit() {
         if (this.isMuted || !this.ctx) return;
-        const notes = [320, 280, 240, 190];
-        notes.forEach((freq, idx) => {
-          const now = this.ctx.currentTime + idx * 0.18;
+        try {
+          const now = this.ctx.currentTime;
           const osc = this.ctx.createOscillator();
           const gain = this.ctx.createGain();
 
-          osc.type = 'sawtooth';
-          osc.frequency.setValueAtTime(freq, now);
+          osc.type = 'square';
+          osc.frequency.setValueAtTime(260, now);
+          osc.frequency.exponentialRampToValueAtTime(60, now + 0.2);
 
-          gain.gain.setValueAtTime(0.25, now);
+          gain.gain.setValueAtTime(0.4, now);
           gain.gain.linearRampToValueAtTime(0.01, now + 0.2);
 
           osc.connect(gain);
           gain.connect(this.ctx.destination);
 
           osc.start(now);
-          osc.stop(now + 0.22);
-        });
+          osc.stop(now + 0.21);
+        } catch (e) {}
+      }
+
+      // Victory fanfare
+      playVictory() {
+        if (this.isMuted || !this.ctx) return;
+        try {
+          const notes = [440, 554, 659, 880, 1108];
+          notes.forEach((freq, idx) => {
+            const now = this.ctx.currentTime + idx * 0.12;
+            const osc = this.ctx.createOscillator();
+            const gain = this.ctx.createGain();
+
+            osc.type = 'triangle';
+            osc.frequency.setValueAtTime(freq, now);
+
+            gain.gain.setValueAtTime(0.35, now);
+            gain.gain.exponentialRampToValueAtTime(0.001, now + 0.4);
+
+            osc.connect(gain);
+            gain.connect(this.ctx.destination);
+
+            osc.start(now);
+            osc.stop(now + 0.45);
+          });
+        } catch (e) {}
+      }
+
+      // Game Over sound
+      playGameOver() {
+        if (this.isMuted || !this.ctx) return;
+        try {
+          const notes = [320, 280, 240, 190];
+          notes.forEach((freq, idx) => {
+            const now = this.ctx.currentTime + idx * 0.18;
+            const osc = this.ctx.createOscillator();
+            const gain = this.ctx.createGain();
+
+            osc.type = 'sawtooth';
+            osc.frequency.setValueAtTime(freq, now);
+
+            gain.gain.setValueAtTime(0.25, now);
+            gain.gain.linearRampToValueAtTime(0.01, now + 0.2);
+
+            osc.connect(gain);
+            gain.connect(this.ctx.destination);
+
+            osc.start(now);
+            osc.stop(now + 0.22);
+          });
+        } catch (e) {}
       }
 
       // Simple UI click pop
       playClick() {
         if (this.isMuted || !this.ctx) return;
-        const now = this.ctx.currentTime;
-        const osc = this.ctx.createOscillator();
-        const gain = this.ctx.createGain();
+        try {
+          const now = this.ctx.currentTime;
+          const osc = this.ctx.createOscillator();
+          const gain = this.ctx.createGain();
 
-        osc.type = 'sine';
-        osc.frequency.setValueAtTime(600, now);
-        osc.frequency.exponentialRampToValueAtTime(300, now + 0.05);
+          osc.type = 'sine';
+          osc.frequency.setValueAtTime(600, now);
+          osc.frequency.exponentialRampToValueAtTime(300, now + 0.05);
 
-        gain.gain.setValueAtTime(0.2, now);
-        gain.gain.linearRampToValueAtTime(0.01, now + 0.05);
+          gain.gain.setValueAtTime(0.2, now);
+          gain.gain.linearRampToValueAtTime(0.01, now + 0.05);
 
-        osc.connect(gain);
-        gain.connect(this.ctx.destination);
+          osc.connect(gain);
+          gain.connect(this.ctx.destination);
 
-        osc.start(now);
-        osc.stop(now + 0.06);
+          osc.start(now);
+          osc.stop(now + 0.06);
+        } catch (e) {}
       }
     }
 
     const sound = new SoundEngine();
+
+    // Global unlock listener for iOS & Android Chrome
+    const unlockAudio = () => {
+      sound.init();
+      if (sound.ctx && sound.ctx.state === 'running') {
+        try {
+          const buf = sound.ctx.createBuffer(1, 1, 22050);
+          const src = sound.ctx.createBufferSource();
+          src.buffer = buf;
+          src.connect(sound.ctx.destination);
+          src.start(0);
+        } catch (e) {}
+      }
+    };
+    ['touchstart', 'touchend', 'click', 'keydown'].forEach(evt => {
+      window.addEventListener(evt, unlockAudio, { once: true, passive: true });
+    });
 
     /* =========================================================
        3. QUESTION DATABASE (18 FLOWGORITHM QUESTIONS FOR M.1 - M.3)
@@ -2341,32 +2397,31 @@
         this.scaleY = 1;
       },
 
-      update(platforms) {
+      update(platforms, dt = 1) {
         // Horizontal Movement
         if (state.keys.left) {
-          this.vx -= this.speed;
+          this.vx -= this.speed * dt;
           this.facing = -1;
         } else if (state.keys.right) {
-          this.vx += this.speed;
+          this.vx += this.speed * dt;
           this.facing = 1;
         } else {
-          this.vx *= this.friction;
+          this.vx *= Math.pow(this.friction, dt);
         }
 
         // Clamp speed
         this.vx = Math.max(-this.maxSpeed, Math.min(this.maxSpeed, this.vx));
-        this.x += this.vx;
+        this.x += this.vx * dt;
 
         // Platform collision horizontal
-        // (basic boundary check)
         if (this.x < 20) {
           this.x = 20;
           this.vx = 0;
         }
 
         // Vertical Movement & Gravity
-        this.vy += this.gravity;
-        this.y += this.vy;
+        this.vy += this.gravity * dt;
+        this.y += this.vy * dt;
 
         // Check platforms collision
         this.isGrounded = false;
@@ -2375,17 +2430,17 @@
             this.x + this.width / 2 > p.x &&
             this.x - this.width / 2 < p.x + p.w &&
             this.y + this.height / 2 >= p.y &&
-            this.y + this.height / 2 <= p.y + p.h + this.vy + 2 &&
+            this.y + this.height / 2 <= p.y + p.h + Math.max(2, this.vy * dt + 2) &&
             this.vy > 0
           ) {
             // Landing
             if (!this.isGrounded) {
-              // Squash on landing
               this.scaleX = 1.25;
               this.scaleY = 0.75;
-              // Spawn dust particles
-              for (let i = 0; i < 4; i++) {
-                particles.push(new Particle(this.x, this.y + this.height / 2, '#CBD5E1', (Math.random() - 0.5) * 3, -Math.random() * 2, 3));
+              if (particles.length < 50) {
+                for (let i = 0; i < 4; i++) {
+                  particles.push(new Particle(this.x, this.y + this.height / 2, '#CBD5E1', (Math.random() - 0.5) * 3, -Math.random() * 2, 3));
+                }
               }
             }
             this.isGrounded = true;
@@ -2398,19 +2453,20 @@
         if (state.keys.jump && this.isGrounded) {
           this.vy = this.jumpForce;
           this.isGrounded = false;
-          // Stretch on jump
           this.scaleX = 0.75;
           this.scaleY = 1.3;
           sound.playJump();
 
-          for (let i = 0; i < 4; i++) {
-            particles.push(new Particle(this.x, this.y + this.height / 2, '#93C5FD', (Math.random() - 0.5) * 2, 1, 3));
+          if (particles.length < 50) {
+            for (let i = 0; i < 4; i++) {
+              particles.push(new Particle(this.x, this.y + this.height / 2, '#93C5FD', (Math.random() - 0.5) * 2, 1, 3));
+            }
           }
         }
 
         // Elastic return of squash/stretch
-        this.scaleX += (1 - this.scaleX) * 0.15;
-        this.scaleY += (1 - this.scaleY) * 0.15;
+        this.scaleX += (1 - this.scaleX) * Math.min(1, 0.15 * dt);
+        this.scaleY += (1 - this.scaleY) * Math.min(1, 0.15 * dt);
 
         // Fall into pit handling
         if (this.y > VIRTUAL_HEIGHT + 80) {
@@ -3399,21 +3455,79 @@
       });
     }
 
+    // Fullscreen Toggle
+    const btnFullscreen = document.getElementById('btn-fullscreen');
+    if (btnFullscreen) {
+      btnFullscreen.addEventListener('click', () => {
+        sound.init();
+        sound.playClick();
+        if (!document.fullscreenElement && !document.webkitFullscreenElement) {
+          const docEl = document.documentElement;
+          if (docEl.requestFullscreen) {
+            docEl.requestFullscreen().catch(() => {});
+          } else if (docEl.webkitRequestFullscreen) {
+            docEl.webkitRequestFullscreen();
+          }
+          btnFullscreen.textContent = '🗗';
+        } else {
+          if (document.exitFullscreen) {
+            document.exitFullscreen().catch(() => {});
+          } else if (document.webkitExitFullscreen) {
+            document.webkitExitFullscreen();
+          }
+          btnFullscreen.textContent = '⛶';
+        }
+      });
+    }
+
+    // Prevent context menu on long touch
+    document.getElementById('game-wrapper')?.addEventListener('contextmenu', e => {
+      e.preventDefault();
+      return false;
+    });
+
     // Mute button
     document.getElementById('btn-sound-toggle').addEventListener('click', () => {
       const isAudible = sound.toggleMute();
       document.getElementById('btn-sound-toggle').textContent = isAudible ? '🔊' : '🔇';
     });
 
+    // Restore saved settings from LocalStorage
+    try {
+      const savedName = localStorage.getItem('flowgorithm_player_name');
+      if (savedName) {
+        state.playerName = savedName;
+        const nameInput = document.getElementById('player-name-input');
+        if (nameInput) nameInput.value = savedName;
+      }
+      const savedAvatar = localStorage.getItem('flowgorithm_player_avatar');
+      if (savedAvatar) {
+        state.playerAvatar = savedAvatar;
+      }
+      const savedMute = localStorage.getItem('flowgorithm_sound_muted');
+      if (savedMute !== null) {
+        sound.isMuted = savedMute === 'true';
+        const toggleBtn = document.getElementById('btn-sound-toggle');
+        if (toggleBtn) toggleBtn.textContent = sound.isMuted ? '🔇' : '🔊';
+      }
+    } catch (e) {}
+
     // Avatar Selection in Start Screen
     const avatarCards = document.querySelectorAll('.avatar-option');
     avatarCards.forEach(card => {
+      if (card.dataset.avatar === state.playerAvatar) {
+        avatarCards.forEach(c => c.classList.remove('selected'));
+        card.classList.add('selected');
+      }
       card.addEventListener('click', () => {
         sound.init();
         sound.playClick();
         avatarCards.forEach(c => c.classList.remove('selected'));
         card.classList.add('selected');
         state.playerAvatar = card.dataset.avatar;
+        try {
+          localStorage.setItem('flowgorithm_player_avatar', state.playerAvatar);
+        } catch (e) {}
       });
     });
 
@@ -3423,7 +3537,12 @@
       sound.playClick();
 
       const nameInput = document.getElementById('player-name-input').value.trim();
-      if (nameInput) state.playerName = nameInput;
+      if (nameInput) {
+        state.playerName = nameInput;
+        try {
+          localStorage.setItem('flowgorithm_player_name', state.playerName);
+        } catch (e) {}
+      }
 
       document.getElementById('start-screen').classList.add('hidden');
       document.getElementById('hud').style.display = 'flex';
@@ -3433,14 +3552,22 @@
       currentLevelData = buildLevel(1);
       player.reset(80, 400);
       updateHUD();
+      lastFrameTime = performance.now();
       state.gameStarted = true;
     });
 
     /* =========================================================
-       17. MAIN GAME LOOP
+       17. MAIN GAME LOOP (WITH DELTA TIME FOR 60Hz/90Hz/120Hz)
        ========================================================= */
-    function gameLoop() {
+    let lastFrameTime = performance.now();
+
+    function gameLoop(timestamp) {
       requestAnimationFrame(gameLoop);
+
+      const now = timestamp || performance.now();
+      const rawDt = (now - lastFrameTime) / 16.666;
+      const dt = Math.max(0.4, Math.min(rawDt, 2.0));
+      lastFrameTime = now;
 
       // Update & Draw Confetti in screen resolution
       confCtx.setTransform(dpr, 0, 0, dpr, 0, 0);
@@ -3457,12 +3584,12 @@
       if (!state.gameStarted) return;
 
       if (!state.isPaused) {
-        // Physics & movement in virtual coordinate space
-        player.update(currentLevelData.platforms);
+        // Physics & movement in virtual coordinate space with dt
+        player.update(currentLevelData.platforms, dt);
 
         // Update Camera target smoothly
         const targetCamX = player.x - visibleWidth * 0.35;
-        camera.x += (targetCamX - camera.x) * 0.1;
+        camera.x += (targetCamX - camera.x) * Math.min(1, 0.1 * dt);
         camera.x = Math.max(0, Math.min(currentLevelData.worldWidth - visibleWidth, camera.x));
 
         // Collisions
@@ -3493,6 +3620,13 @@
 
       // Render Player
       player.draw(ctx, camera.x);
+    }
+
+    // PWA Service Worker Registration
+    if ('serviceWorker' in navigator && (window.location.protocol === 'https:' || window.location.hostname === 'localhost')) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('./sw.js').catch(() => {});
+      });
     }
 
     // Initialize layout on load
