@@ -196,10 +196,14 @@
       transition: opacity 0.3s ease;
     }
 
+    .hidden {
+      display: none !important;
+    }
+
     .modal-overlay.hidden {
       opacity: 0;
       pointer-events: none;
-      display: none;
+      display: none !important;
     }
 
     .modal-card {
@@ -209,11 +213,45 @@
       max-width: 680px;
       max-height: 92vh;
       overflow-y: auto;
+      -webkit-overflow-scrolling: touch;
       padding: 24px 28px;
       box-shadow: 0 20px 50px rgba(0, 0, 0, 0.3);
       border: 4px solid #C7D2FE;
       text-align: center;
       animation: popIn 0.35s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+      position: relative;
+    }
+
+    .modal-actions-sticky {
+      position: sticky;
+      bottom: -4px;
+      background: linear-gradient(180deg, rgba(255, 255, 255, 0) 0%, rgba(255, 255, 255, 0.96) 24%, #FFFFFF 100%);
+      padding: 12px 0 6px 0;
+      margin-top: 10px;
+      z-index: 20;
+    }
+
+    .tap-to-continue {
+      margin-top: 8px;
+      font-size: 0.95rem;
+      font-weight: 700;
+      text-decoration: underline;
+      letter-spacing: 0.5px;
+      animation: pulseContinue 1.3s infinite ease-in-out;
+    }
+
+    @keyframes pulseContinue {
+      0%, 100% { transform: scale(1); opacity: 0.95; }
+      50% { transform: scale(1.03); opacity: 1; }
+    }
+
+    #btn-next-question, #btn-minigame-continue, #btn-boss-next {
+      animation: pulseGlowBtn 2s infinite ease-in-out;
+    }
+
+    @keyframes pulseGlowBtn {
+      0%, 100% { transform: scale(1); box-shadow: 0 6px 16px rgba(16, 185, 129, 0.35); }
+      50% { transform: scale(1.02); box-shadow: 0 8px 24px rgba(16, 185, 129, 0.55); }
     }
 
     @keyframes popIn {
@@ -1290,10 +1328,10 @@
         </div>
 
         <!-- Explanation area -->
-        <div id="answer-explanation" class="answer-explanation"></div>
+        <div id="answer-explanation" class="answer-explanation" style="cursor: pointer;" title="แตะเพื่อลุยต่อ"></div>
 
-        <div id="question-actions" style="display: none; margin-top: 10px;">
-          <button id="btn-next-question" class="btn btn-success">
+        <div id="question-actions" class="modal-actions-sticky" style="display: none;">
+          <button id="btn-next-question" class="btn btn-success" style="width: 100%; font-size: 1.25rem; padding: 14px 28px; box-shadow: 0 6px 16px rgba(16,185,129,0.35);">
             ลุยต่อเลย! 🏃💨
           </button>
         </div>
@@ -1334,17 +1372,17 @@
           </div>
         </div>
 
-        <div id="minigame-feedback" class="answer-explanation"></div>
+        <div id="minigame-feedback" class="answer-explanation" style="cursor: pointer;" title="แตะเพื่อลุยต่อ"></div>
 
-        <div style="display: flex; gap: 12px; justify-content: center; margin-top: 16px;">
+        <div class="modal-actions-sticky" style="display: flex; gap: 12px; justify-content: center; flex-wrap: wrap;">
           <button id="btn-minigame-reset" class="btn btn-secondary" style="padding: 10px 20px;">
             🔄 เริ่มเรียงใหม่
           </button>
           <button id="btn-minigame-check" class="btn btn-success" style="padding: 10px 24px;">
             ✅ ตรวจคำตอบ!
           </button>
-          <button id="btn-minigame-continue" class="btn btn-primary hidden" style="padding: 10px 24px;">
-            🎉 ยอดเยี่ยม! ไปต่อเลย
+          <button id="btn-minigame-continue" class="btn btn-primary hidden" style="width: 100%; font-size: 1.2rem; padding: 12px 24px;">
+            🎉 ยอดเยี่ยม! ไปต่อเลย 🏃💨
           </button>
         </div>
       </div>
@@ -1389,10 +1427,10 @@
         <div id="boss-choices-container" class="choices-grid"></div>
 
         <!-- Boss Feedback -->
-        <div id="boss-feedback" class="answer-explanation"></div>
+        <div id="boss-feedback" class="answer-explanation" style="cursor: pointer;" title="แตะเพื่อลุยต่อ"></div>
 
-        <div id="boss-actions" style="display: none; margin-top: 10px;">
-          <button id="btn-boss-next" class="btn btn-danger">
+        <div id="boss-actions" class="modal-actions-sticky" style="display: none;">
+          <button id="btn-boss-next" class="btn btn-danger" style="width: 100%; font-size: 1.25rem; padding: 14px 28px;">
             โจมตีบักต่อไป! ⚔️
           </button>
         </div>
@@ -2757,17 +2795,32 @@
       document.getElementById('hud-hearts').textContent = heartsStr;
     }
 
+    function resetAllInputs() {
+      state.keys.left = false;
+      state.keys.right = false;
+      state.keys.jump = false;
+      const btnLeft = document.getElementById('btn-left');
+      const btnRight = document.getElementById('btn-right');
+      const btnJump = document.getElementById('btn-jump');
+      if (btnLeft) btnLeft.classList.remove('active');
+      if (btnRight) btnRight.classList.remove('active');
+      if (btnJump) btnJump.classList.remove('active');
+    }
+
     function handleFallPit() {
       state.lives--;
       sound.playWrong();
       updateHUD();
+      resetAllInputs();
 
       if (state.lives <= 0) {
         triggerGameOver();
       } else {
         // Respawn at safe start
         player.reset(80, 400);
-        player.invulnerableTimer = 60;
+        player.vx = 0;
+        player.vy = 0;
+        player.invulnerableTimer = 80;
         showFloatingText('ระวังตกเหว! -1 ❤️', visibleWidth / 2 - 70, VIRTUAL_HEIGHT / 2, '#EF4444');
       }
     }
@@ -2777,13 +2830,17 @@
         if (crystal.collected) continue;
 
         const dist = Math.hypot(player.x - crystal.x, player.y - crystal.y);
-        if (dist < 40) {
+        if (dist < 42) {
           // Collected!
           crystal.collected = true;
           state.crystalsCollected++;
           state.score += 50;
           sound.playCrystal();
           updateHUD();
+
+          // Stop momentum & clear active inputs
+          player.vx = 0;
+          resetAllInputs();
 
           // Spawn burst particles
           for (let i = 0; i < 14; i++) {
@@ -2794,11 +2851,11 @@
 
           // Pause and trigger Question or Mini-game
           if (crystal.isMinigame) {
-            setTimeout(() => triggerMinigame(), 350);
+            setTimeout(() => triggerMinigame(), 250);
           } else {
             const q = QUESTION_BANK[state.questionCursor % QUESTION_BANK.length];
             state.questionCursor++;
-            setTimeout(() => triggerQuestionModal(q), 350);
+            setTimeout(() => triggerQuestionModal(q), 250);
           }
           break;
         }
@@ -2813,6 +2870,8 @@
         player.y < portal.y + portal.h
       ) {
         if (state.crystalsCollected >= state.crystalsRequired) {
+          player.vx = 0;
+          resetAllInputs();
           triggerBossBattle();
         } else {
           showFloatingText(`ต้องเก็บคริสตัลให้ครบ ${state.crystalsRequired} เม็ดก่อนนะ! 💎`, (visibleWidth / 2) - 120, VIRTUAL_HEIGHT / 2, '#F59E0B');
@@ -2826,6 +2885,7 @@
        ========================================================= */
     function renderFlowchartHTML(containerId, fcData) {
       const container = document.getElementById(containerId);
+      if (!container) return;
       container.innerHTML = '';
 
       if (!fcData) return;
@@ -2836,6 +2896,7 @@
         return;
       }
 
+      let html = '';
       // Flowgorithm Header Badge
       html += `
         <div class="fg-badge">
@@ -2927,8 +2988,29 @@
     /* =========================================================
        12. QUESTION MODAL CONTROLLER
        ========================================================= */
+    let lastProceedTime = 0;
+
+    function proceedFromQuestion(e) {
+      if (e && e.type === 'touchend') e.preventDefault();
+      const now = Date.now();
+      if (now - lastProceedTime < 250) return;
+      lastProceedTime = now;
+
+      sound.playClick();
+      document.getElementById('question-modal').classList.add('hidden');
+      resetAllInputs();
+      player.vx = 0;
+      state.isPaused = false;
+
+      if (state.lives <= 0) {
+        triggerGameOver();
+      }
+    }
+
     function triggerQuestionModal(questionObj) {
       state.isPaused = true;
+      resetAllInputs();
+      player.vx = 0;
       state.activeQuestion = questionObj;
 
       renderFlowchartHTML('flowchart-area', questionObj.flowchart);
@@ -2940,6 +3022,7 @@
       const explanationBox = document.getElementById('answer-explanation');
       explanationBox.className = 'answer-explanation';
       explanationBox.style.display = 'none';
+      explanationBox.onclick = null;
 
       document.getElementById('question-actions').style.display = 'none';
 
@@ -2956,7 +3039,10 @@
         choicesBox.appendChild(btn);
       });
 
-      document.getElementById('question-modal').classList.remove('hidden');
+      const qModal = document.getElementById('question-modal');
+      qModal.classList.remove('hidden');
+      const card = qModal.querySelector('.modal-card');
+      if (card) card.scrollTop = 0;
     }
 
     function handleChoiceSelect(buttonEl, choiceObj, questionObj) {
@@ -2969,7 +3055,7 @@
       if (choiceObj.correct) {
         buttonEl.classList.add('correct');
         explanationBox.className = 'answer-explanation correct';
-        explanationBox.innerHTML = `🎉 <strong>ถูกต้องจ้า!</strong> ${questionObj.explanation}`;
+        explanationBox.innerHTML = `🎉 <strong>ถูกต้องจ้า!</strong> ${questionObj.explanation}<div class="tap-to-continue">👉 แตะที่นี่หรือกดปุ่มด้านล่างเพื่อลุยต่อ ➔</div>`;
         state.score += 100;
         sound.playCorrect();
         triggerConfetti(50);
@@ -2980,26 +3066,35 @@
           if (questionObj.choices[i].correct) b.classList.add('correct');
         });
         explanationBox.className = 'answer-explanation wrong';
-        explanationBox.innerHTML = `❌ <strong>ยังไม่ถูกต้องนะ:</strong> ${questionObj.explanation}`;
+        explanationBox.innerHTML = `❌ <strong>ยังไม่ถูกต้องนะ:</strong> ${questionObj.explanation}<div class="tap-to-continue">👉 แตะที่นี่หรือกดปุ่มด้านล่างเพื่อลุยต่อ ➔</div>`;
         state.lives--;
         sound.playWrong();
-        player.vx = -7; // knockback!
+        player.vx = 0;
+        player.vy = -3; // gentle safe hop
+        player.invulnerableTimer = 60;
       }
 
       updateHUD();
       explanationBox.style.display = 'block';
-      document.getElementById('question-actions').style.display = 'block';
+      explanationBox.onclick = proceedFromQuestion;
+
+      const qActions = document.getElementById('question-actions');
+      qActions.style.display = 'block';
+
+      // Auto-scroll modal card to reveal explanation and proceed button smoothly
+      const card = document.querySelector('#question-modal .modal-card');
+      if (card) {
+        setTimeout(() => {
+          card.scrollTo({ top: card.scrollHeight, behavior: 'smooth' });
+        }, 50);
+      }
     }
 
-    document.getElementById('btn-next-question').addEventListener('click', () => {
-      sound.playClick();
-      document.getElementById('question-modal').classList.add('hidden');
-      state.isPaused = false;
-
-      if (state.lives <= 0) {
-        triggerGameOver();
-      }
-    });
+    const btnNextQ = document.getElementById('btn-next-question');
+    if (btnNextQ) {
+      btnNextQ.addEventListener('click', proceedFromQuestion);
+      btnNextQ.addEventListener('touchend', proceedFromQuestion, { passive: false });
+    }
 
     /* =========================================================
        13. MINI-GAME: REORDER FLOWCHART STEPS
@@ -3008,12 +3103,27 @@
     let minigameSourceList = [];
     let minigameTargetList = [];
 
+    function proceedFromMinigame(e) {
+      if (e && e.type === 'touchend') e.preventDefault();
+      sound.playClick();
+      document.getElementById('minigame-modal').classList.add('hidden');
+      resetAllInputs();
+      player.vx = 0;
+      state.isPaused = false;
+    }
+
     function triggerMinigame() {
       state.isPaused = true;
+      resetAllInputs();
+      player.vx = 0;
+
       const scenario = MINIGAME_SCENARIOS[minigameCurrentIndex % MINIGAME_SCENARIOS.length];
 
       document.getElementById('minigame-mission').textContent = scenario.mission;
-      document.getElementById('minigame-feedback').style.display = 'none';
+      const feedback = document.getElementById('minigame-feedback');
+      feedback.style.display = 'none';
+      feedback.onclick = null;
+
       document.getElementById('btn-minigame-continue').classList.add('hidden');
       document.getElementById('btn-minigame-check').style.display = 'inline-flex';
       document.getElementById('btn-minigame-reset').style.display = 'inline-flex';
@@ -3022,7 +3132,10 @@
       minigameTargetList = [];
 
       renderMinigameBoards();
-      document.getElementById('minigame-modal').classList.remove('hidden');
+      const mgModal = document.getElementById('minigame-modal');
+      mgModal.classList.remove('hidden');
+      const card = mgModal.querySelector('.modal-card');
+      if (card) card.scrollTop = 0;
     }
 
     function renderMinigameBoards() {
@@ -3114,13 +3227,23 @@
         updateHUD();
 
         feedback.className = 'answer-explanation correct';
-        feedback.innerHTML = '🎉 <strong>สุดยอดมาก!</strong> คุณจัดเรียงผังงานได้ถูกต้องสมบูรณ์แบบ ได้รับโบนัส 200 คะแนน!';
+        feedback.innerHTML = '🎉 <strong>สุดยอดมาก!</strong> คุณจัดเรียงผังงานได้ถูกต้องสมบูรณ์แบบ ได้รับโบนัส 200 คะแนน!<div class="tap-to-continue">👉 แตะที่นี่หรือกดปุ่มด้านล่างเพื่อลุยต่อ ➔</div>';
         feedback.style.display = 'block';
+        feedback.onclick = proceedFromMinigame;
 
         document.getElementById('btn-minigame-check').style.display = 'none';
         document.getElementById('btn-minigame-reset').style.display = 'none';
-        document.getElementById('btn-minigame-continue').classList.remove('hidden');
+        const continueBtn = document.getElementById('btn-minigame-continue');
+        continueBtn.classList.remove('hidden');
         minigameCurrentIndex++;
+
+        // Auto-scroll to show success
+        const card = document.querySelector('#minigame-modal .modal-card');
+        if (card) {
+          setTimeout(() => {
+            card.scrollTo({ top: card.scrollHeight, behavior: 'smooth' });
+          }, 50);
+        }
       } else {
         sound.playWrong();
         feedback.className = 'answer-explanation wrong';
@@ -3129,11 +3252,11 @@
       }
     });
 
-    document.getElementById('btn-minigame-continue').addEventListener('click', () => {
-      sound.playClick();
-      document.getElementById('minigame-modal').classList.add('hidden');
-      state.isPaused = false;
-    });
+    const btnMgContinue = document.getElementById('btn-minigame-continue');
+    if (btnMgContinue) {
+      btnMgContinue.addEventListener('click', proceedFromMinigame);
+      btnMgContinue.addEventListener('touchend', proceedFromMinigame, { passive: false });
+    }
 
     /* =========================================================
        14. BOSS BATTLE CONTROLLER
@@ -3143,11 +3266,16 @@
       state.bossActive = true;
       state.bossHP = 5;
       state.currentBossQIndex = 0;
+      resetAllInputs();
+      player.vx = 0;
 
       updateBossUI();
       loadBossQuestion(state.currentBossQIndex);
 
-      document.getElementById('boss-modal').classList.remove('hidden');
+      const bModal = document.getElementById('boss-modal');
+      bModal.classList.remove('hidden');
+      const card = bModal.querySelector('.modal-card');
+      if (card) card.scrollTop = 0;
     }
 
     function updateBossUI() {
@@ -3159,12 +3287,13 @@
     }
 
     function loadBossQuestion(idx) {
-      if (idx >= BOSS_QUESTIONS.length) {
+      if (state.bossHP <= 0) {
         handleBossVictory();
         return;
       }
 
-      const q = BOSS_QUESTIONS[idx];
+      // Loop questions safely if battle continues
+      const q = BOSS_QUESTIONS[idx % BOSS_QUESTIONS.length];
       renderFlowchartHTML('boss-flowchart-area', q.flowchart);
       document.getElementById('boss-question-text').textContent = q.scenario;
 
@@ -3173,6 +3302,7 @@
 
       const feedback = document.getElementById('boss-feedback');
       feedback.style.display = 'none';
+      feedback.onclick = null;
       document.getElementById('boss-actions').style.display = 'none';
 
       const labels = ['1', '2', '3'];
@@ -3210,7 +3340,7 @@
 
         speech.textContent = 'โอ๊ยยย! ตรวจพบและแก้ Bug ใน Flowgorithm ได้เฉียบคมมาก!';
         feedback.className = 'answer-explanation correct';
-        feedback.innerHTML = `💥 <strong>โจมตีสำเร็จ!</strong> ${qObj.explanation}`;
+        feedback.innerHTML = `💥 <strong>โจมตีสำเร็จ!</strong> ${qObj.explanation}<div class="tap-to-continue">👉 แตะที่นี่หรือกดปุ่มด้านล่างเพื่อลุยต่อ ➔</div>`;
         triggerConfetti(35);
       } else {
         btnEl.classList.add('wrong');
@@ -3220,14 +3350,24 @@
 
         speech.textContent = 'ฮ่าๆๆ! ติดกับดัก Syntax & Logic Bug ของข้าเข้าแล้ว!';
         feedback.className = 'answer-explanation wrong';
-        feedback.innerHTML = `❌ <strong>บอสป้องกันได้:</strong> ${qObj.explanation}`;
+        feedback.innerHTML = `❌ <strong>บอสป้องกันได้:</strong> ${qObj.explanation}<div class="tap-to-continue">👉 แตะที่นี่หรือกดปุ่มด้านล่างเพื่อลุยต่อ ➔</div>`;
       }
 
       feedback.style.display = 'block';
+      feedback.onclick = proceedFromBoss;
       document.getElementById('boss-actions').style.display = 'block';
+
+      // Auto-scroll to show result
+      const card = document.querySelector('#boss-modal .modal-card');
+      if (card) {
+        setTimeout(() => {
+          card.scrollTo({ top: card.scrollHeight, behavior: 'smooth' });
+        }, 50);
+      }
     }
 
-    document.getElementById('btn-boss-next').addEventListener('click', () => {
+    function proceedFromBoss(e) {
+      if (e && e.type === 'touchend') e.preventDefault();
       sound.playClick();
       if (state.lives <= 0) {
         document.getElementById('boss-modal').classList.add('hidden');
@@ -3241,19 +3381,29 @@
         state.currentBossQIndex++;
         loadBossQuestion(state.currentBossQIndex);
       }
-    });
+    }
+
+    const btnBossNext = document.getElementById('btn-boss-next');
+    if (btnBossNext) {
+      btnBossNext.addEventListener('click', proceedFromBoss);
+      btnBossNext.addEventListener('touchend', proceedFromBoss, { passive: false });
+    }
 
     function handleBossVictory() {
       sound.playVictory();
       triggerConfetti(120);
 
       document.getElementById('boss-modal').classList.add('hidden');
+      state.bossActive = false;
+      resetAllInputs();
+      player.vx = 0;
 
       if (state.currentLevel < state.totalLevels) {
         // Next Level!
         state.currentLevel++;
         state.crystalsCollected = 0;
         currentLevelData = buildLevel(state.currentLevel);
+        camera.x = 0;
         player.reset(80, 400);
         updateHUD();
         state.isPaused = false;
@@ -3269,6 +3419,7 @@
        ========================================================= */
     function triggerGameOver() {
       state.isPaused = true;
+      resetAllInputs();
       sound.playGameOver();
       document.getElementById('game-over-modal').classList.remove('hidden');
     }
@@ -3281,6 +3432,7 @@
 
     function triggerGameWin() {
       state.isPaused = true;
+      resetAllInputs();
       sound.playVictory();
       triggerConfetti(150);
 
@@ -3301,8 +3453,12 @@
       state.currentLevel = 1;
       state.crystalsCollected = 0;
       state.questionCursor = 0;
+      state.bossActive = false;
+      minigameCurrentIndex = 0;
       currentLevelData = buildLevel(1);
+      camera.x = 0;
       player.reset(80, 400);
+      resetAllInputs();
       updateHUD();
       state.isPaused = false;
     }
@@ -3313,6 +3469,31 @@
     // Keyboard
     window.addEventListener('keydown', e => {
       sound.init(); // initialize Web Audio on first keypress
+
+      // Allow Space / Enter to advance modals when action button is visible
+      if (e.key === ' ' || e.key === 'Enter') {
+        const qActions = document.getElementById('question-actions');
+        if (qActions && qActions.style.display !== 'none' && !document.getElementById('question-modal').classList.contains('hidden')) {
+          e.preventDefault();
+          proceedFromQuestion();
+          return;
+        }
+
+        const mgCont = document.getElementById('btn-minigame-continue');
+        if (mgCont && !mgCont.classList.contains('hidden') && !document.getElementById('minigame-modal').classList.contains('hidden')) {
+          e.preventDefault();
+          proceedFromMinigame();
+          return;
+        }
+
+        const bossActions = document.getElementById('boss-actions');
+        if (bossActions && bossActions.style.display !== 'none' && !document.getElementById('boss-modal').classList.contains('hidden')) {
+          e.preventDefault();
+          proceedFromBoss();
+          return;
+        }
+      }
+
       if (e.key === 'ArrowLeft' || e.key === 'a' || e.key === 'A') state.keys.left = true;
       if (e.key === 'ArrowRight' || e.key === 'd' || e.key === 'D') state.keys.right = true;
       if (e.key === 'ArrowUp' || e.key === 'w' || e.key === 'W' || e.key === ' ') {
