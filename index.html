@@ -2,7 +2,10 @@
 <html lang="th">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <title>ผจญภัยเมืองผังงาน Flowgorithm (Flowgorithm IF-THEN Adventure) - ม.1 ถึง ม.3</title>
   <!-- Google Fonts: Mali -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -36,15 +39,20 @@
       user-select: none;
       -webkit-user-select: none;
       -webkit-tap-highlight-color: transparent;
+      -webkit-touch-callout: none;
     }
 
-    body {
+    html, body {
       font-family: var(--font-cute);
-      background: #1e1e2f;
+      background: #0f172a;
       color: #333;
       overflow: hidden;
-      width: 100vw;
-      height: 100vh;
+      width: 100%;
+      height: 100%;
+      height: 100dvh;
+      position: fixed;
+      overscroll-behavior: none;
+      -webkit-text-size-adjust: 100%;
       display: flex;
       justify-content: center;
       align-items: center;
@@ -53,7 +61,8 @@
     #game-wrapper {
       position: relative;
       width: 100vw;
-      height: 100vh;
+      height: 100%;
+      height: 100dvh;
       max-width: 1200px;
       max-height: 800px;
       background: #000;
@@ -61,12 +70,14 @@
       box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
       display: flex;
       flex-direction: column;
+      touch-action: none;
     }
 
     @media (min-width: 1200px) and (min-height: 800px) {
       #game-wrapper {
         border-radius: 24px;
         height: 90vh;
+        height: 90dvh;
       }
     }
 
@@ -794,56 +805,282 @@
     }
 
     /* =========================================================
-       ON-SCREEN CONTROLS FOR MOBILE
+       ON-SCREEN CONTROLS FOR SMARTPHONE & TOUCH
        ========================================================= */
     #mobile-controls {
       position: absolute;
-      bottom: 16px;
-      left: 16px;
-      right: 16px;
+      bottom: max(16px, env(safe-area-inset-bottom, 16px));
+      left: max(14px, env(safe-area-inset-left, 14px));
+      right: max(14px, env(safe-area-inset-right, 14px));
       display: flex;
       justify-content: space-between;
       align-items: flex-end;
       pointer-events: none;
-      z-index: 30;
+      z-index: 35;
+      touch-action: none;
     }
-    .mobile-btn-group {
+    .mobile-dpad {
       display: flex;
       gap: 12px;
       pointer-events: auto;
+      touch-action: none;
+      background: rgba(255, 255, 255, 0.45);
+      backdrop-filter: blur(8px);
+      padding: 6px;
+      border-radius: 999px;
+      border: 2px solid rgba(255, 255, 255, 0.6);
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.25);
+    }
+    .mobile-action {
+      pointer-events: auto;
+      touch-action: none;
     }
     .touch-btn {
-      width: 64px;
-      height: 64px;
+      width: 62px;
+      height: 62px;
       border-radius: 50%;
-      background: rgba(255, 255, 255, 0.85);
-      backdrop-filter: blur(4px);
+      background: linear-gradient(145deg, #FFFFFF, #E2E8F0);
       border: 3px solid #C7D2FE;
-      box-shadow: 0 6px 16px rgba(0, 0, 0, 0.2);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2), inset 0 2px 2px rgba(255, 255, 255, 0.8);
       display: flex;
+      flex-direction: column;
       align-items: center;
       justify-content: center;
-      font-size: 1.8rem;
+      font-size: 1.6rem;
       color: #3730A3;
       user-select: none;
-      touch-action: manipulation;
-      transition: transform 0.1s, background 0.1s;
+      -webkit-user-select: none;
+      touch-action: none;
+      transition: transform 0.08s, background 0.1s;
     }
     .touch-btn:active, .touch-btn.active {
-      transform: scale(0.92);
-      background: #E0E7FF;
-      border-color: #6366F1;
+      transform: scale(0.90);
+      background: linear-gradient(145deg, #C7D2FE, #818CF8);
+      color: white;
+      border-color: #4F46E5;
     }
     .jump-btn {
       width: 74px;
       height: 74px;
-      background: rgba(245, 158, 11, 0.88);
-      border-color: #FDE68A;
+      border-radius: 50%;
+      background: linear-gradient(145deg, #F59E0B, #D97706);
+      border: 3px solid #FEF3C7;
       color: white;
-      font-size: 2rem;
+      font-size: 1.7rem;
+      box-shadow: 0 8px 20px rgba(245, 158, 11, 0.45), inset 0 2px 2px rgba(255, 255, 255, 0.4);
     }
     .jump-btn:active, .jump-btn.active {
-      background: #D97706;
+      transform: scale(0.90);
+      background: linear-gradient(145deg, #B45309, #78350F);
+      border-color: #FCD34D;
+    }
+    .btn-subtext {
+      font-size: 0.65rem;
+      font-weight: 700;
+      line-height: 1;
+      margin-top: 1px;
+    }
+
+    /* Orientation Hint for Smartphones */
+    .orientation-hint {
+      position: absolute;
+      top: 56px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: rgba(15, 23, 42, 0.92);
+      backdrop-filter: blur(6px);
+      color: #FCD34D;
+      padding: 6px 14px;
+      border-radius: 999px;
+      font-size: 0.76rem;
+      font-weight: 600;
+      display: none;
+      align-items: center;
+      gap: 8px;
+      z-index: 25;
+      box-shadow: 0 4px 14px rgba(0, 0, 0, 0.35);
+      border: 1px solid rgba(252, 211, 77, 0.4);
+      white-space: nowrap;
+    }
+    @media (orientation: portrait) and (max-width: 768px) {
+      .orientation-hint {
+        display: flex;
+      }
+    }
+    .orientation-close-btn {
+      background: transparent;
+      border: none;
+      color: #94A3B8;
+      font-size: 0.9rem;
+      cursor: pointer;
+      padding: 0 4px;
+    }
+
+    /* =========================================================
+       RESPONSIVE DESIGN RULES (SMARTPHONE SPECIFIC)
+       ========================================================= */
+    @media (max-width: 768px) {
+      #hud {
+        top: max(8px, env(safe-area-inset-top, 8px));
+        left: max(8px, env(safe-area-inset-left, 8px));
+        right: max(8px, env(safe-area-inset-right, 8px));
+        padding: 5px 10px;
+        font-size: 0.85rem;
+        border-radius: 14px;
+        border-width: 2px;
+      }
+      .hud-group {
+        gap: 5px;
+      }
+      .hud-badge {
+        padding: 4px 8px;
+        font-size: 0.82rem;
+        border-width: 1.5px;
+        gap: 3px;
+      }
+      #hud-name {
+        display: none; /* Hide player name to save horizontal space on mobile */
+      }
+      .hud-lives {
+        font-size: 1.05rem;
+        letter-spacing: 1px;
+      }
+      .hud-btn {
+        padding: 4px 8px;
+        font-size: 1rem;
+        border-radius: 8px;
+      }
+
+      /* Modals on Mobile */
+      .modal-overlay {
+        padding: 8px;
+        align-items: center;
+      }
+      .modal-card {
+        padding: 16px 14px;
+        border-radius: 20px;
+        max-width: 95vw;
+        max-height: 88dvh;
+        border-width: 3px;
+      }
+      .modal-title {
+        font-size: 1.35rem;
+        margin-bottom: 4px;
+      }
+      .modal-subtitle {
+        font-size: 0.88rem;
+        margin-bottom: 12px;
+      }
+      .question-scenario {
+        font-size: 0.92rem;
+        padding: 10px 12px;
+        margin-bottom: 12px;
+      }
+      .choices-grid {
+        grid-template-columns: 1fr;
+        gap: 8px;
+        margin-bottom: 12px;
+      }
+      .choice-btn {
+        padding: 10px 12px;
+        font-size: 0.9rem;
+        border-radius: 12px;
+      }
+      .choice-badge {
+        width: 26px;
+        height: 26px;
+        font-size: 0.85rem;
+      }
+      .flowchart-container {
+        padding: 10px 6px;
+        margin: 8px 0;
+      }
+      .fg-badge {
+        font-size: 0.72rem;
+        padding: 2px 8px;
+      }
+      .fg-main, .fg-end {
+        font-size: 0.8rem;
+        padding: 4px 14px;
+      }
+      .fg-declare, .fg-assign {
+        font-size: 0.78rem;
+        padding: 4px 10px;
+      }
+      .fg-input-box, .fg-output-box {
+        font-size: 0.78rem;
+        padding: 4px 10px;
+      }
+      .fc-decision-wrapper {
+        width: 100px;
+        height: 75px;
+      }
+      .fc-decision-diamond {
+        width: 65px;
+        height: 65px;
+      }
+      .fc-decision-text {
+        font-size: 0.75rem;
+        max-width: 95px;
+      }
+      .fc-branches {
+        gap: 8px;
+      }
+      .fc-branch-label {
+        font-size: 0.75rem;
+        padding: 2px 6px;
+      }
+      .fc-arrow-down {
+        height: 18px;
+      }
+
+      /* Minigame on Mobile */
+      .step-dropzone {
+        min-height: 65px;
+        padding: 6px;
+        gap: 6px;
+      }
+      .step-card {
+        padding: 8px 10px;
+        font-size: 0.82rem;
+        border-radius: 8px;
+      }
+
+      /* Boss arena on Mobile */
+      .boss-arena {
+        padding: 10px;
+        margin-bottom: 8px;
+        border-radius: 14px;
+      }
+      .boss-sprite {
+        font-size: 3.2rem;
+      }
+      .boss-quote {
+        font-size: 0.8rem;
+        padding: 4px 10px;
+      }
+      .btn {
+        padding: 10px 20px;
+        font-size: 1.05rem;
+        border-radius: 14px;
+      }
+    }
+
+    @media (max-width: 480px) {
+      .avatar-option {
+        padding: 6px 2px;
+        font-size: 1.6rem;
+      }
+      .avatar-option span {
+        font-size: 0.7rem;
+      }
+      .feature-tags {
+        margin: 10px 0 16px;
+      }
+      .feature-tag {
+        font-size: 0.75rem;
+        padding: 2px 8px;
+      }
     }
 
     /* Floating score text */
@@ -938,14 +1175,27 @@
       </div>
     </div>
 
+    <!-- Portrait Orientation Helper Hint (Smartphone) -->
+    <div id="orientation-hint" class="orientation-hint">
+      <span>📱 แนะนำหมุนหน้าจอแนวนอนเพื่อมุมมองที่กว้างขึ้น</span>
+      <button id="btn-close-orientation" class="orientation-close-btn" aria-label="ปิด">✕</button>
+    </div>
+
     <!-- Mobile On-Screen Controls -->
     <div id="mobile-controls" style="display: none;">
-      <div class="mobile-btn-group">
-        <button id="btn-left" class="touch-btn" aria-label="เดินซ้าย">◀</button>
-        <button id="btn-right" class="touch-btn" aria-label="เดินขวา">▶</button>
+      <div class="mobile-dpad">
+        <button id="btn-left" class="touch-btn" aria-label="เดินซ้าย">
+          <span>◀</span>
+        </button>
+        <button id="btn-right" class="touch-btn" aria-label="เดินขวา">
+          <span>▶</span>
+        </button>
       </div>
-      <div class="mobile-btn-group">
-        <button id="btn-jump" class="touch-btn jump-btn" aria-label="กระโดด">▲</button>
+      <div class="mobile-action">
+        <button id="btn-jump" class="touch-btn jump-btn" aria-label="กระโดด">
+          <span>▲</span>
+          <span class="btn-subtext">กระโดด</span>
+        </button>
       </div>
     </div>
 
@@ -1965,14 +2215,34 @@
     const confCanvas = document.getElementById('confettiCanvas');
     const confCtx = confCanvas.getContext('2d');
 
+    const VIRTUAL_HEIGHT = 600;
+    let renderScale = 1;
+    let visibleWidth = 800;
+    let dpr = 1;
+
     function resizeCanvases() {
       const wrapper = document.getElementById('game-wrapper');
-      canvas.width = wrapper.clientWidth;
-      canvas.height = wrapper.clientHeight;
-      confCanvas.width = wrapper.clientWidth;
-      confCanvas.height = wrapper.clientHeight;
+      dpr = Math.min(window.devicePixelRatio || 1, 2);
+      const displayW = wrapper.clientWidth;
+      const displayH = wrapper.clientHeight;
+
+      renderScale = displayH / VIRTUAL_HEIGHT;
+      visibleWidth = displayW / renderScale;
+
+      canvas.width = Math.round(displayW * dpr);
+      canvas.height = Math.round(displayH * dpr);
+      canvas.style.width = displayW + 'px';
+      canvas.style.height = displayH + 'px';
+
+      confCanvas.width = Math.round(displayW * dpr);
+      confCanvas.height = Math.round(displayH * dpr);
+      confCanvas.style.width = displayW + 'px';
+      confCanvas.style.height = displayH + 'px';
     }
     window.addEventListener('resize', resizeCanvases);
+    window.addEventListener('orientationchange', () => {
+      setTimeout(resizeCanvases, 250);
+    });
 
     // Particle class for crystal sparkles and movement dust
     class Particle {
@@ -2006,7 +2276,7 @@
     // Confetti Piece for celebrations
     class Confetti {
       constructor() {
-        this.x = Math.random() * confCanvas.width;
+        this.x = Math.random() * (confCanvas.width / (dpr || 1));
         this.y = -20;
         this.size = Math.random() * 8 + 6;
         this.color = ['#F59E0B', '#10B981', '#3B82F6', '#EC4899', '#8B5CF6', '#EF4444'][Math.floor(Math.random() * 6)];
@@ -2143,7 +2413,7 @@
         this.scaleY += (1 - this.scaleY) * 0.15;
 
         // Fall into pit handling
-        if (this.y > canvas.height + 150) {
+        if (this.y > VIRTUAL_HEIGHT + 80) {
           handleFallPit();
         }
 
@@ -2254,18 +2524,18 @@
        ========================================================= */
     function drawBackground(c, camX) {
       // Dynamic sky gradient
-      const grad = c.createLinearGradient(0, 0, 0, canvas.height);
+      const grad = c.createLinearGradient(0, 0, 0, VIRTUAL_HEIGHT);
       grad.addColorStop(0, currentLevelData.bgGradient[0]);
       grad.addColorStop(0.6, currentLevelData.bgGradient[1]);
       grad.addColorStop(1, currentLevelData.bgGradient[2]);
       c.fillStyle = grad;
-      c.fillRect(0, 0, canvas.width, canvas.height);
+      c.fillRect(0, 0, visibleWidth, VIRTUAL_HEIGHT);
 
       // Parallax soft clouds
       c.save();
       c.fillStyle = 'rgba(255, 255, 255, 0.6)';
       for (let i = 0; i < 6; i++) {
-        const cloudX = ((i * 450 - camX * 0.25) % (canvas.width + 300)) - 100;
+        const cloudX = ((i * 450 - camX * 0.25) % (visibleWidth + 300)) - 100;
         const cloudY = 70 + (i % 3) * 45;
         c.beginPath();
         c.arc(cloudX, cloudY, 32, 0, Math.PI * 2);
@@ -2279,12 +2549,12 @@
       c.save();
       c.fillStyle = 'rgba(16, 185, 129, 0.25)';
       c.beginPath();
-      c.moveTo(0, canvas.height);
-      for (let x = 0; x <= canvas.width; x += 50) {
-        const y = canvas.height - 180 + Math.sin((x + camX * 0.1) * 0.005) * 50;
+      c.moveTo(0, VIRTUAL_HEIGHT);
+      for (let x = 0; x <= visibleWidth; x += 50) {
+        const y = VIRTUAL_HEIGHT - 180 + Math.sin((x + camX * 0.1) * 0.005) * 50;
         c.lineTo(x, y);
       }
-      c.lineTo(canvas.width, canvas.height);
+      c.lineTo(visibleWidth, VIRTUAL_HEIGHT);
       c.closePath();
       c.fill();
       c.restore();
@@ -2292,7 +2562,7 @@
 
     function drawPlatforms(c, camX) {
       for (const p of currentLevelData.platforms) {
-        if (p.x + p.w < camX - 50 || p.x > camX + canvas.width + 50) continue;
+        if (p.x + p.w < camX - 50 || p.x > camX + visibleWidth + 50) continue;
 
         if (p.type === 'grass') {
           // Lush grass platform
@@ -2403,12 +2673,14 @@
     /* =========================================================
        10. GAME LOGIC & INTERACTION
        ========================================================= */
-    function showFloatingText(text, x, y, color = '#F59E0B') {
+    function showFloatingText(text, virtualX, virtualY, color = '#F59E0B') {
       const el = document.createElement('div');
       el.className = 'floating-text';
       el.textContent = text;
-      el.style.left = `${x}px`;
-      el.style.top = `${y}px`;
+      const screenX = virtualX * renderScale;
+      const screenY = virtualY * renderScale;
+      el.style.left = `${screenX}px`;
+      el.style.top = `${screenY}px`;
       el.style.color = color;
       document.getElementById('game-wrapper').appendChild(el);
       setTimeout(() => el.remove(), 800);
@@ -2440,7 +2712,7 @@
         // Respawn at safe start
         player.reset(80, 400);
         player.invulnerableTimer = 60;
-        showFloatingText('ระวังตกเหว! -1 ❤️', canvas.width / 2 - 60, canvas.height / 2, '#EF4444');
+        showFloatingText('ระวังตกเหว! -1 ❤️', visibleWidth / 2 - 70, VIRTUAL_HEIGHT / 2, '#EF4444');
       }
     }
 
@@ -2487,7 +2759,7 @@
         if (state.crystalsCollected >= state.crystalsRequired) {
           triggerBossBattle();
         } else {
-          showFloatingText(`ต้องเก็บคริสตัลให้ครบ ${state.crystalsRequired} เม็ดก่อนนะ! 💎`, canvas.width / 2 - 120, canvas.height / 2, '#F59E0B');
+          showFloatingText(`ต้องเก็บคริสตัลให้ครบ ${state.crystalsRequired} เม็ดก่อนนะ! 💎`, (visibleWidth / 2) - 120, VIRTUAL_HEIGHT / 2, '#F59E0B');
           player.x = portal.x - 30; // bump back
         }
       }
@@ -2929,7 +3201,7 @@
         player.reset(80, 400);
         updateHUD();
         state.isPaused = false;
-        showFloatingText(`🎉 ยินดีด้วย! ผ่านเข้าสู่ด่านที่ ${state.currentLevel}!`, canvas.width / 2 - 120, canvas.height / 2, '#10B981');
+        showFloatingText(`🎉 ยินดีด้วย! ผ่านเข้าสู่ด่านที่ ${state.currentLevel}!`, visibleWidth / 2 - 120, VIRTUAL_HEIGHT / 2, '#10B981');
       } else {
         // Win Complete Game!
         triggerGameWin();
@@ -2999,31 +3271,133 @@
       if (e.key === 'ArrowUp' || e.key === 'w' || e.key === 'W' || e.key === ' ') state.keys.jump = false;
     });
 
-    // Touch controls helper
-    function setupTouchButton(id, keyName) {
-      const btn = document.getElementById(id);
-      const start = e => {
-        e.preventDefault();
-        sound.init();
-        state.keys[keyName] = true;
-        btn.classList.add('active');
-      };
-      const end = e => {
-        e.preventDefault();
-        state.keys[keyName] = false;
-        btn.classList.remove('active');
-      };
+    // Multi-touch & Smartphone Gamepad controls
+    function setupMobileTouchControls() {
+      const btnLeft = document.getElementById('btn-left');
+      const btnRight = document.getElementById('btn-right');
+      const btnJump = document.getElementById('btn-jump');
+      const dpad = document.querySelector('.mobile-dpad');
 
-      btn.addEventListener('touchstart', start, { passive: false });
-      btn.addEventListener('touchend', end, { passive: false });
-      btn.addEventListener('mousedown', start);
-      btn.addEventListener('mouseup', end);
-      btn.addEventListener('mouseleave', end);
+      let dpadTouchId = null;
+      let jumpTouchId = null;
+
+      function updateDpadFromTouch(touch) {
+        if (!dpad) return;
+        const rect = dpad.getBoundingClientRect();
+        const touchX = touch.clientX;
+        const midX = rect.left + rect.width / 2;
+
+        if (touchX < midX) {
+          if (!state.keys.left) {
+            state.keys.left = true;
+            state.keys.right = false;
+            btnLeft.classList.add('active');
+            btnRight.classList.remove('active');
+            if (navigator.vibrate) navigator.vibrate(8);
+          }
+        } else {
+          if (!state.keys.right) {
+            state.keys.right = true;
+            state.keys.left = false;
+            btnRight.classList.add('active');
+            btnLeft.classList.remove('active');
+            if (navigator.vibrate) navigator.vibrate(8);
+          }
+        }
+      }
+
+      function resetDpad() {
+        state.keys.left = false;
+        state.keys.right = false;
+        btnLeft.classList.remove('active');
+        btnRight.classList.remove('active');
+        dpadTouchId = null;
+      }
+
+      if (dpad) {
+        dpad.addEventListener('touchstart', e => {
+          e.preventDefault();
+          sound.init();
+          const touch = e.changedTouches[0];
+          dpadTouchId = touch.identifier;
+          updateDpadFromTouch(touch);
+        }, { passive: false });
+
+        dpad.addEventListener('touchmove', e => {
+          e.preventDefault();
+          for (let i = 0; i < e.changedTouches.length; i++) {
+            if (e.changedTouches[i].identifier === dpadTouchId) {
+              updateDpadFromTouch(e.changedTouches[i]);
+              break;
+            }
+          }
+        }, { passive: false });
+
+        const endDpadTouch = e => {
+          for (let i = 0; i < e.changedTouches.length; i++) {
+            if (e.changedTouches[i].identifier === dpadTouchId) {
+              resetDpad();
+              break;
+            }
+          }
+        };
+        dpad.addEventListener('touchend', endDpadTouch, { passive: false });
+        dpad.addEventListener('touchcancel', resetDpad, { passive: false });
+
+        // Mouse fallback for desktop testing
+        btnLeft.addEventListener('mousedown', e => { e.preventDefault(); sound.init(); state.keys.left = true; btnLeft.classList.add('active'); });
+        btnLeft.addEventListener('mouseup', () => { state.keys.left = false; btnLeft.classList.remove('active'); });
+        btnLeft.addEventListener('mouseleave', () => { state.keys.left = false; btnLeft.classList.remove('active'); });
+
+        btnRight.addEventListener('mousedown', e => { e.preventDefault(); sound.init(); state.keys.right = true; btnRight.classList.add('active'); });
+        btnRight.addEventListener('mouseup', () => { state.keys.right = false; btnRight.classList.remove('active'); });
+        btnRight.addEventListener('mouseleave', () => { state.keys.right = false; btnRight.classList.remove('active'); });
+      }
+
+      // Jump Touch Handling
+      if (btnJump) {
+        btnJump.addEventListener('touchstart', e => {
+          e.preventDefault();
+          sound.init();
+          const touch = e.changedTouches[0];
+          jumpTouchId = touch.identifier;
+          state.keys.jump = true;
+          btnJump.classList.add('active');
+          if (navigator.vibrate) navigator.vibrate(12);
+        }, { passive: false });
+
+        const endJumpTouch = e => {
+          for (let i = 0; i < e.changedTouches.length; i++) {
+            if (e.changedTouches[i].identifier === jumpTouchId) {
+              state.keys.jump = false;
+              btnJump.classList.remove('active');
+              jumpTouchId = null;
+              break;
+            }
+          }
+        };
+        btnJump.addEventListener('touchend', endJumpTouch, { passive: false });
+        btnJump.addEventListener('touchcancel', () => {
+          state.keys.jump = false;
+          btnJump.classList.remove('active');
+          jumpTouchId = null;
+        }, { passive: false });
+
+        btnJump.addEventListener('mousedown', e => { e.preventDefault(); sound.init(); state.keys.jump = true; btnJump.classList.add('active'); });
+        btnJump.addEventListener('mouseup', () => { state.keys.jump = false; btnJump.classList.remove('active'); });
+        btnJump.addEventListener('mouseleave', () => { state.keys.jump = false; btnJump.classList.remove('active'); });
+      }
     }
 
-    setupTouchButton('btn-left', 'left');
-    setupTouchButton('btn-right', 'right');
-    setupTouchButton('btn-jump', 'jump');
+    setupMobileTouchControls();
+
+    // Orientation helper dismiss
+    const orientBtn = document.getElementById('btn-close-orientation');
+    if (orientBtn) {
+      orientBtn.addEventListener('click', () => {
+        document.getElementById('orientation-hint').style.display = 'none';
+      });
+    }
 
     // Mute button
     document.getElementById('btn-sound-toggle').addEventListener('click', () => {
@@ -3068,13 +3442,14 @@
     function gameLoop() {
       requestAnimationFrame(gameLoop);
 
-      // Update & Draw Confetti always
-      confCtx.clearRect(0, 0, confCanvas.width, confCanvas.height);
+      // Update & Draw Confetti in screen resolution
+      confCtx.setTransform(dpr, 0, 0, dpr, 0, 0);
+      confCtx.clearRect(0, 0, confCanvas.clientWidth, confCanvas.clientHeight);
       for (let i = confettiList.length - 1; i >= 0; i--) {
         const c = confettiList[i];
         c.update();
         c.draw(confCtx);
-        if (c.y > confCanvas.height + 20) {
+        if (c.y > confCanvas.clientHeight + 20) {
           confettiList.splice(i, 1);
         }
       }
@@ -3082,13 +3457,13 @@
       if (!state.gameStarted) return;
 
       if (!state.isPaused) {
-        // Physics & movement
+        // Physics & movement in virtual coordinate space
         player.update(currentLevelData.platforms);
 
         // Update Camera target smoothly
-        const targetCamX = player.x - canvas.width * 0.35;
+        const targetCamX = player.x - visibleWidth * 0.35;
         camera.x += (targetCamX - camera.x) * 0.1;
-        camera.x = Math.max(0, Math.min(currentLevelData.worldWidth - canvas.width, camera.x));
+        camera.x = Math.max(0, Math.min(currentLevelData.worldWidth - visibleWidth, camera.x));
 
         // Collisions
         checkCrystalCollisions();
@@ -3103,8 +3478,9 @@
         }
       }
 
-      // Render World
-      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      // Render World with Hi-DPI & Virtual scale transform
+      ctx.setTransform(renderScale * dpr, 0, 0, renderScale * dpr, 0, 0);
+      ctx.clearRect(0, 0, visibleWidth, VIRTUAL_HEIGHT);
       drawBackground(ctx, camera.x);
       drawPlatforms(ctx, camera.x);
       drawCrystals(ctx, camera.x);
