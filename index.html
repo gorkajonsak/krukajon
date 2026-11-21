@@ -1,0 +1,3129 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>ผจญภัยเมืองผังงาน Flowgorithm (Flowgorithm IF-THEN Adventure) - ม.1 ถึง ม.3</title>
+  <!-- Google Fonts: Mali -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Mali:ital,wght@0,300;0,400;0,600;0,700;1,400&family=Prompt:wght@400;600;700&display=swap" rel="stylesheet">
+
+  <style>
+    /* =========================================================
+       1. CSS STYLES & THEMES
+       ========================================================= */
+    :root {
+      --primary: #4F46E5;
+      --primary-light: #818CF8;
+      --primary-dark: #3730A3;
+      --secondary: #F59E0B;
+      --secondary-light: #FCD34D;
+      --success: #10B981;
+      --danger: #EF4444;
+      --info: #06B6D4;
+      --bg-gradient-1: linear-gradient(135deg, #6EE7B7 0%, #3B82F6 100%);
+      --bg-gradient-2: linear-gradient(135deg, #FBCFE8 0%, #7C3AED 100%);
+      --card-bg: rgba(255, 255, 255, 0.95);
+      --font-cute: 'Mali', cursive, sans-serif;
+      --font-body: 'Prompt', sans-serif;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      user-select: none;
+      -webkit-user-select: none;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    body {
+      font-family: var(--font-cute);
+      background: #1e1e2f;
+      color: #333;
+      overflow: hidden;
+      width: 100vw;
+      height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+
+    #game-wrapper {
+      position: relative;
+      width: 100vw;
+      height: 100vh;
+      max-width: 1200px;
+      max-height: 800px;
+      background: #000;
+      overflow: hidden;
+      box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
+      display: flex;
+      flex-direction: column;
+    }
+
+    @media (min-width: 1200px) and (min-height: 800px) {
+      #game-wrapper {
+        border-radius: 24px;
+        height: 90vh;
+      }
+    }
+
+    /* Canvas styling */
+    #gameCanvas {
+      width: 100%;
+      height: 100%;
+      display: block;
+      background: #60A5FA;
+    }
+
+    /* Confetti Overlay */
+    #confettiCanvas {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      z-index: 100;
+    }
+
+    /* =========================================================
+       HUD BAR
+       ========================================================= */
+    #hud {
+      position: absolute;
+      top: 12px;
+      left: 12px;
+      right: 12px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 10px 18px;
+      background: rgba(255, 255, 255, 0.92);
+      backdrop-filter: blur(8px);
+      border-radius: 18px;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+      z-index: 20;
+      font-weight: 700;
+      font-size: 1.05rem;
+      border: 3px solid #E0E7FF;
+      transition: all 0.3s ease;
+    }
+
+    .hud-group {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .hud-badge {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      background: #EEF2FF;
+      padding: 6px 14px;
+      border-radius: 999px;
+      border: 2px solid #C7D2FE;
+      color: #3730A3;
+    }
+
+    .hud-lives {
+      color: #EF4444;
+      font-size: 1.3rem;
+      letter-spacing: 2px;
+    }
+
+    .hud-btn {
+      background: #F3F4F6;
+      border: 2px solid #D1D5DB;
+      border-radius: 12px;
+      padding: 6px 12px;
+      cursor: pointer;
+      font-size: 1.2rem;
+      transition: transform 0.1s, background 0.2s;
+    }
+    .hud-btn:hover {
+      background: #E5E7EB;
+      transform: scale(1.05);
+    }
+    .hud-btn:active {
+      transform: scale(0.95);
+    }
+
+    /* =========================================================
+       OVERLAYS & MODALS
+       ========================================================= */
+    .modal-overlay {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(15, 23, 42, 0.75);
+      backdrop-filter: blur(6px);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      z-index: 50;
+      padding: 16px;
+      opacity: 1;
+      transition: opacity 0.3s ease;
+    }
+
+    .modal-overlay.hidden {
+      opacity: 0;
+      pointer-events: none;
+      display: none;
+    }
+
+    .modal-card {
+      background: var(--card-bg);
+      border-radius: 28px;
+      width: 100%;
+      max-width: 680px;
+      max-height: 92vh;
+      overflow-y: auto;
+      padding: 24px 28px;
+      box-shadow: 0 20px 50px rgba(0, 0, 0, 0.3);
+      border: 4px solid #C7D2FE;
+      text-align: center;
+      animation: popIn 0.35s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    }
+
+    @keyframes popIn {
+      0% { transform: scale(0.85); opacity: 0; }
+      100% { transform: scale(1); opacity: 1; }
+    }
+
+    .modal-title {
+      font-size: 1.8rem;
+      font-weight: 700;
+      color: #312E81;
+      margin-bottom: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+    }
+
+    .modal-subtitle {
+      font-size: 1.05rem;
+      color: #4B5563;
+      margin-bottom: 18px;
+    }
+
+    /* Buttons */
+    .btn {
+      font-family: var(--font-cute);
+      font-size: 1.15rem;
+      font-weight: 700;
+      padding: 12px 28px;
+      border-radius: 18px;
+      border: none;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      box-shadow: 0 6px 0 rgba(0, 0, 0, 0.15), 0 10px 20px rgba(0, 0, 0, 0.1);
+      transition: all 0.15s ease;
+    }
+    .btn:hover {
+      transform: translateY(-2px);
+    }
+    .btn:active {
+      transform: translateY(4px);
+      box-shadow: 0 2px 0 rgba(0, 0, 0, 0.15);
+    }
+    .btn-primary {
+      background: linear-gradient(135deg, #6366F1, #4F46E5);
+      color: white;
+    }
+    .btn-secondary {
+      background: linear-gradient(135deg, #F59E0B, #D97706);
+      color: white;
+    }
+    .btn-success {
+      background: linear-gradient(135deg, #10B981, #059669);
+      color: white;
+    }
+    .btn-danger {
+      background: linear-gradient(135deg, #EF4444, #DC2626);
+      color: white;
+    }
+
+    /* =========================================================
+       START SCREEN STYLES
+       ========================================================= */
+    #start-screen .modal-card {
+      max-width: 600px;
+      background: linear-gradient(180deg, #FFFFFF 0%, #F5F3FF 100%);
+    }
+
+    .input-group {
+      margin: 16px 0;
+      text-align: left;
+    }
+
+    .input-label {
+      display: block;
+      font-size: 1.1rem;
+      font-weight: 600;
+      color: #3730A3;
+      margin-bottom: 6px;
+    }
+
+    .text-input {
+      width: 100%;
+      padding: 12px 18px;
+      font-size: 1.15rem;
+      font-family: var(--font-cute);
+      border: 3px solid #C7D2FE;
+      border-radius: 16px;
+      outline: none;
+      transition: border-color 0.2s, box-shadow 0.2s;
+      background: #FFFFFF;
+    }
+    .text-input:focus {
+      border-color: #6366F1;
+      box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.2);
+    }
+
+    .avatar-grid {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 10px;
+      margin-top: 8px;
+    }
+
+    .avatar-option {
+      background: #FFFFFF;
+      border: 3px solid #E0E7FF;
+      border-radius: 16px;
+      padding: 10px 4px;
+      font-size: 2.2rem;
+      cursor: pointer;
+      transition: all 0.2s;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 4px;
+    }
+    .avatar-option span {
+      font-size: 0.8rem;
+      font-weight: 600;
+      color: #6B7280;
+    }
+    .avatar-option:hover {
+      transform: translateY(-4px);
+      border-color: #818CF8;
+    }
+    .avatar-option.selected {
+      background: #EEF2FF;
+      border-color: #4F46E5;
+      box-shadow: 0 0 0 4px rgba(79, 70, 229, 0.25);
+      transform: scale(1.05);
+    }
+    .avatar-option.selected span {
+      color: #4F46E5;
+      font-weight: 700;
+    }
+
+    .feature-tags {
+      display: flex;
+      justify-content: center;
+      gap: 8px;
+      flex-wrap: wrap;
+      margin: 16px 0 24px;
+    }
+    .feature-tag {
+      background: #E0E7FF;
+      color: #4338CA;
+      font-size: 0.85rem;
+      font-weight: 600;
+      padding: 4px 12px;
+      border-radius: 999px;
+    }
+
+    /* =========================================================
+       FLOWCHART VISUALIZER (PURE HTML & CSS)
+       ========================================================= */
+    .flowchart-container {
+      background: #F8FAFC;
+      border: 2px dashed #94A3B8;
+      border-radius: 20px;
+      padding: 16px 12px;
+      margin: 14px 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      overflow-x: auto;
+      max-width: 100%;
+    }
+
+    .fc-node {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 600;
+      font-size: 0.95rem;
+      text-align: center;
+      line-height: 1.25;
+      padding: 8px 14px;
+      min-width: 110px;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08);
+      position: relative;
+    }
+
+    /* Start / End Terminator */
+    .fc-terminator {
+      background: #ECFDF5;
+      border: 2.5px solid #10B981;
+      color: #065F46;
+      border-radius: 999px;
+    }
+
+    /* Process Rectangle */
+    .fc-process {
+      background: #EFF6FF;
+      border: 2.5px solid #3B82F6;
+      color: #1E40AF;
+      border-radius: 10px;
+    }
+
+    /* Decision Diamond (Container + Inner content rotated) */
+    .fc-decision-wrapper {
+      position: relative;
+      width: 130px;
+      height: 90px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 4px 0;
+    }
+    .fc-decision-diamond {
+      position: absolute;
+      width: 80px;
+      height: 80px;
+      background: #FEF3C7;
+      border: 2.5px solid #F59E0B;
+      transform: rotate(45deg);
+      border-radius: 8px;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08);
+    }
+    .fc-decision-text {
+      position: relative;
+      z-index: 2;
+      color: #92400E;
+      font-weight: 700;
+      font-size: 0.85rem;
+      padding: 4px;
+      max-width: 120px;
+      line-height: 1.15;
+    }
+
+    /* Flow Connectors */
+    .fc-arrow-down {
+      width: 2px;
+      height: 24px;
+      background: #64748B;
+      position: relative;
+      margin: 2px 0;
+    }
+    .fc-arrow-down::after {
+      content: '';
+      position: absolute;
+      bottom: 0;
+      left: -4px;
+      width: 0;
+      height: 0;
+      border-left: 5px solid transparent;
+      border-right: 5px solid transparent;
+      border-top: 6px solid #64748B;
+    }
+
+    /* Decision Branches container */
+    .fc-branches {
+      display: flex;
+      justify-content: space-between;
+      width: 100%;
+      max-width: 480px;
+      gap: 16px;
+      margin-top: 6px;
+      position: relative;
+    }
+    .fc-branch-col {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      position: relative;
+    }
+    .fc-branch-label {
+      font-size: 0.82rem;
+      font-weight: 700;
+      padding: 3px 10px;
+      border-radius: 999px;
+      margin-bottom: 4px;
+    }
+    .fc-branch-true {
+      background: #DCFCE7;
+      color: #15803D;
+      border: 1.5px solid #86EFAC;
+    }
+    .fc-branch-false {
+      background: #FEE2E2;
+      color: #B91C1C;
+      border: 1.5px solid #FCA5A5;
+    }
+
+    /* =========================================================
+       FLOWGORITHM SPECIFIC NODES & STYLING (FOR M.1 - M.3)
+       ========================================================= */
+    .fg-badge {
+      background: #0F172A;
+      color: #38BDF8;
+      font-family: 'Consolas', 'Courier New', monospace;
+      font-size: 0.78rem;
+      font-weight: 700;
+      padding: 3px 12px;
+      border-radius: 999px;
+      margin-bottom: 8px;
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      border: 1.5px solid #38BDF8;
+    }
+    .fg-main, .fg-end {
+      border-radius: 999px;
+      background: #E2E8F0;
+      border: 2.5px solid #475569;
+      color: #1E293B;
+      font-weight: 700;
+      padding: 5px 22px;
+      font-family: 'Consolas', monospace;
+      font-size: 0.9rem;
+      box-shadow: 0 3px 8px rgba(0,0,0,0.08);
+    }
+    .fg-declare {
+      background: #FEF9C3;
+      border: 2.5px solid #EAB308;
+      color: #854D0E;
+      border-radius: 6px;
+      padding: 6px 18px;
+      font-weight: 700;
+      font-family: 'Consolas', monospace;
+      font-size: 0.88rem;
+      box-shadow: 0 3px 8px rgba(0,0,0,0.08);
+      position: relative;
+    }
+    .fg-assign {
+      background: #FFFBEB;
+      border: 2.5px solid #F59E0B;
+      color: #92400E;
+      border-radius: 6px;
+      padding: 6px 18px;
+      font-weight: 700;
+      font-family: 'Consolas', monospace;
+      font-size: 0.88rem;
+      box-shadow: 0 3px 8px rgba(0,0,0,0.08);
+    }
+    .fg-input-box {
+      background: #E0F2FE;
+      border: 2.5px solid #0284C7;
+      color: #0369A1;
+      border-radius: 4px;
+      padding: 6px 18px;
+      font-weight: 700;
+      font-family: 'Consolas', monospace;
+      font-size: 0.88rem;
+      transform: skewX(-14deg);
+      box-shadow: 0 3px 8px rgba(0,0,0,0.08);
+      display: inline-block;
+    }
+    .fg-input-box > span {
+      display: inline-block;
+      transform: skewX(14deg);
+    }
+    .fg-output-box {
+      background: #DCFCE7;
+      border: 2.5px solid #16A34A;
+      color: #15803D;
+      border-radius: 4px;
+      padding: 6px 18px;
+      font-weight: 700;
+      font-family: 'Consolas', monospace;
+      font-size: 0.88rem;
+      transform: skewX(-14deg);
+      box-shadow: 0 3px 8px rgba(0,0,0,0.08);
+      display: inline-block;
+    }
+    .fg-output-box > span {
+      display: inline-block;
+      transform: skewX(14deg);
+    }
+
+    /* Question Prompt & Choices */
+    .question-scenario {
+      background: #EEF2FF;
+      border-left: 5px solid #4F46E5;
+      padding: 12px 16px;
+      border-radius: 12px;
+      font-size: 1.05rem;
+      font-weight: 600;
+      color: #1E1B4B;
+      text-align: left;
+      margin-bottom: 16px;
+      line-height: 1.45;
+    }
+
+    .choices-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 10px;
+      margin-bottom: 16px;
+    }
+
+    @media (min-width: 580px) {
+      .choices-grid {
+        grid-template-columns: 1fr 1fr;
+      }
+    }
+
+    .choice-btn {
+      background: #FFFFFF;
+      border: 2.5px solid #E2E8F0;
+      border-radius: 16px;
+      padding: 12px 16px;
+      font-family: var(--font-cute);
+      font-size: 1rem;
+      font-weight: 600;
+      color: #1E293B;
+      text-align: left;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      transition: all 0.15s ease;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.04);
+    }
+    .choice-btn:hover {
+      background: #F8FAFC;
+      border-color: #818CF8;
+      transform: translateY(-2px);
+    }
+    .choice-badge {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      background: #EEF2FF;
+      color: #4F46E5;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+    .choice-btn.correct {
+      background: #ECFDF5;
+      border-color: #10B981;
+      color: #065F46;
+    }
+    .choice-btn.correct .choice-badge {
+      background: #10B981;
+      color: white;
+    }
+    .choice-btn.wrong {
+      background: #FEF2F2;
+      border-color: #EF4444;
+      color: #991B1B;
+    }
+    .choice-btn.wrong .choice-badge {
+      background: #EF4444;
+      color: white;
+    }
+
+    /* Explanation popup */
+    .answer-explanation {
+      padding: 12px;
+      border-radius: 14px;
+      font-size: 0.95rem;
+      font-weight: 600;
+      margin-bottom: 14px;
+      display: none;
+      animation: fadeIn 0.3s ease;
+    }
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(-6px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    .answer-explanation.correct {
+      background: #D1FAE5;
+      color: #065F46;
+      border: 2px solid #6EE7B7;
+      display: block;
+    }
+    .answer-explanation.wrong {
+      background: #FEE2E2;
+      color: #991B1B;
+      border: 2px solid #FCA5A5;
+      display: block;
+    }
+
+    /* =========================================================
+       MINI-GAME: REORDER FLOWCHART
+       ========================================================= */
+    .minigame-pool-container {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      margin: 16px 0;
+    }
+    .minigame-section-title {
+      font-size: 0.95rem;
+      font-weight: 700;
+      color: #4338CA;
+      text-align: left;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .step-dropzone {
+      min-height: 80px;
+      background: #F1F5F9;
+      border: 2.5px dashed #94A3B8;
+      border-radius: 16px;
+      padding: 10px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      align-items: center;
+    }
+    .step-card {
+      background: #FFFFFF;
+      border: 2px solid #CBD5E1;
+      border-radius: 12px;
+      padding: 10px 16px;
+      width: 100%;
+      max-width: 440px;
+      font-weight: 600;
+      font-size: 0.95rem;
+      cursor: pointer;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+      transition: all 0.2s;
+    }
+    .step-card:hover {
+      border-color: #6366F1;
+      transform: scale(1.01);
+      box-shadow: 0 4px 10px rgba(99, 102, 241, 0.15);
+    }
+    .step-card.active-choice {
+      background: #EEF2FF;
+      border-color: #4F46E5;
+    }
+
+    /* =========================================================
+       BOSS BATTLE UI
+       ========================================================= */
+    .boss-arena {
+      background: linear-gradient(180deg, #1E1B4B 0%, #312E81 100%);
+      color: white;
+      border-radius: 20px;
+      padding: 16px;
+      margin-bottom: 16px;
+      position: relative;
+      overflow: hidden;
+    }
+    .boss-sprite-container {
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      margin: 10px 0;
+    }
+    .boss-sprite {
+      font-size: 5rem;
+      animation: bossFloat 2s ease-in-out infinite alternate;
+      display: inline-block;
+      filter: drop-shadow(0 0 16px #EF4444);
+    }
+    @keyframes bossFloat {
+      0% { transform: translateY(0) scale(1); }
+      100% { transform: translateY(-10px) scale(1.05); }
+    }
+    .boss-sprite.hit {
+      animation: bossHitAnim 0.4s ease;
+    }
+    @keyframes bossHitAnim {
+      0%, 100% { transform: translateX(0); filter: brightness(1) drop-shadow(0 0 20px #EF4444); }
+      20%, 60% { transform: translateX(-15px) scale(0.9); filter: brightness(2) drop-shadow(0 0 30px #F59E0B); }
+      40%, 80% { transform: translateX(15px) scale(1.1); filter: brightness(2) drop-shadow(0 0 30px #EF4444); }
+    }
+    .boss-hp-container {
+      width: 100%;
+      max-width: 400px;
+      margin: 8px auto 0;
+    }
+    .boss-hp-bar {
+      height: 20px;
+      background: rgba(255, 255, 255, 0.2);
+      border-radius: 999px;
+      overflow: hidden;
+      border: 2px solid rgba(255, 255, 255, 0.4);
+      position: relative;
+    }
+    .boss-hp-fill {
+      height: 100%;
+      background: linear-gradient(90deg, #EF4444, #F59E0B);
+      width: 100%;
+      transition: width 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    .boss-quote {
+      font-size: 0.95rem;
+      background: rgba(255, 255, 255, 0.15);
+      border-radius: 12px;
+      padding: 6px 14px;
+      margin-top: 8px;
+      display: inline-block;
+    }
+
+    /* =========================================================
+       ON-SCREEN CONTROLS FOR MOBILE
+       ========================================================= */
+    #mobile-controls {
+      position: absolute;
+      bottom: 16px;
+      left: 16px;
+      right: 16px;
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-end;
+      pointer-events: none;
+      z-index: 30;
+    }
+    .mobile-btn-group {
+      display: flex;
+      gap: 12px;
+      pointer-events: auto;
+    }
+    .touch-btn {
+      width: 64px;
+      height: 64px;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, 0.85);
+      backdrop-filter: blur(4px);
+      border: 3px solid #C7D2FE;
+      box-shadow: 0 6px 16px rgba(0, 0, 0, 0.2);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.8rem;
+      color: #3730A3;
+      user-select: none;
+      touch-action: manipulation;
+      transition: transform 0.1s, background 0.1s;
+    }
+    .touch-btn:active, .touch-btn.active {
+      transform: scale(0.92);
+      background: #E0E7FF;
+      border-color: #6366F1;
+    }
+    .jump-btn {
+      width: 74px;
+      height: 74px;
+      background: rgba(245, 158, 11, 0.88);
+      border-color: #FDE68A;
+      color: white;
+      font-size: 2rem;
+    }
+    .jump-btn:active, .jump-btn.active {
+      background: #D97706;
+    }
+
+    /* Floating score text */
+    .floating-text {
+      position: absolute;
+      color: #F59E0B;
+      font-weight: 700;
+      font-size: 1.4rem;
+      pointer-events: none;
+      animation: floatUp 0.8s ease-out forwards;
+      text-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
+      z-index: 25;
+    }
+    @keyframes floatUp {
+      0% { opacity: 1; transform: translateY(0) scale(1); }
+      100% { opacity: 0; transform: translateY(-40px) scale(1.3); }
+    }
+
+    /* Badges list in Win Screen */
+    .badges-grid {
+      display: flex;
+      justify-content: center;
+      gap: 14px;
+      flex-wrap: wrap;
+      margin: 18px 0;
+    }
+    .badge-card {
+      background: #FFFBEB;
+      border: 2px solid #FCD34D;
+      border-radius: 16px;
+      padding: 12px 14px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      width: 140px;
+      box-shadow: 0 4px 10px rgba(245, 158, 11, 0.12);
+    }
+    .badge-icon {
+      font-size: 2.2rem;
+      margin-bottom: 4px;
+    }
+    .badge-name {
+      font-size: 0.85rem;
+      font-weight: 700;
+      color: #92400E;
+    }
+
+    /* Scrollbars */
+    ::-webkit-scrollbar {
+      width: 6px;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: #CBD5E1;
+      border-radius: 999px;
+    }
+  </style>
+</head>
+<body>
+
+  <div id="game-wrapper">
+    <!-- Game Canvas -->
+    <canvas id="gameCanvas"></canvas>
+    <!-- Confetti Canvas -->
+    <canvas id="confettiCanvas"></canvas>
+
+    <!-- Top HUD Bar -->
+    <div id="hud" style="display: none;">
+      <div class="hud-group">
+        <div class="hud-badge">
+          <span id="hud-avatar">👦</span>
+          <span id="hud-name">ผู้กล้า</span>
+        </div>
+        <div class="hud-badge hud-lives">
+          <span id="hud-hearts">❤️❤️❤️</span>
+        </div>
+      </div>
+
+      <div class="hud-group">
+        <div class="hud-badge">
+          <span>🏰 ด่าน:</span>
+          <span id="hud-level" style="color: #4F46E5;">1/2</span>
+        </div>
+        <div class="hud-badge">
+          <span>💎</span>
+          <span id="hud-crystals">0/4</span>
+        </div>
+        <div class="hud-badge">
+          <span>⭐</span>
+          <span id="hud-score">0</span>
+        </div>
+        <button id="btn-sound-toggle" class="hud-btn" title="เปิด/ปิดเสียง">🔊</button>
+      </div>
+    </div>
+
+    <!-- Mobile On-Screen Controls -->
+    <div id="mobile-controls" style="display: none;">
+      <div class="mobile-btn-group">
+        <button id="btn-left" class="touch-btn" aria-label="เดินซ้าย">◀</button>
+        <button id="btn-right" class="touch-btn" aria-label="เดินขวา">▶</button>
+      </div>
+      <div class="mobile-btn-group">
+        <button id="btn-jump" class="touch-btn jump-btn" aria-label="กระโดด">▲</button>
+      </div>
+    </div>
+
+    <!-- =========================================================
+         START SCREEN MODAL
+         ========================================================= -->
+    <div id="start-screen" class="modal-overlay">
+      <div class="modal-card">
+        <div style="font-size: 3.5rem; margin-bottom: 6px; animation: bounce 1.5s infinite;">💻⚡</div>
+        <h1 class="modal-title">ผจญภัยเมืองผังงาน Flowgorithm</h1>
+        <p class="modal-subtitle">ออกแบบผังงานแบบมีเงื่อนไข (IF-THEN, AND, OR) และชนิดข้อมูลตัวแปร ฉบับ ม.1 - ม.3</p>
+
+        <div class="feature-tags">
+          <span class="feature-tag">🎯 วิทยาการคำนวณ ม.1 - ม.3</span>
+          <span class="feature-tag">⚡ โปรแกรม Flowgorithm</span>
+          <span class="feature-tag">📦 Declare / Input / Assign / Output</span>
+          <span class="feature-tag">💡 เงื่อนไข AND / OR / NOT & Nested If</span>
+          <span class="feature-tag">🔍 ตรวจจับ Syntax & Logic Error</span>
+        </div>
+
+        <div class="input-group">
+          <label class="input-label" for="player-name-input">👤 ชื่อโปรแกรมเมอร์รุ่นเยาว์:</label>
+          <input type="text" id="player-name-input" class="text-input" placeholder="พิมพ์ชื่อของคุณที่นี่..." maxlength="15" value="จอมเวทโค้ดเดอร์">
+        </div>
+
+        <div class="input-group">
+          <label class="input-label">✨ เลือกตัวละครของคุณ:</label>
+          <div class="avatar-grid" id="avatar-selector">
+            <div class="avatar-option selected" data-avatar="👦">
+              <div>👦</div><span>เด็กชาย</span>
+            </div>
+            <div class="avatar-option" data-avatar="👧">
+              <div>👧</div><span>เด็กหญิง</span>
+            </div>
+            <div class="avatar-option" data-avatar="🤖">
+              <div>🤖</div><span>โรบ็อต</span>
+            </div>
+            <div class="avatar-option" data-avatar="🐱">
+              <div>🐱</div><span>แมวส้ม</span>
+            </div>
+            <div class="avatar-option" data-avatar="🦊">
+              <div>🦊</div><span>จิ้งจอก</span>
+            </div>
+          </div>
+        </div>
+
+        <div style="margin-top: 24px;">
+          <button id="btn-start-game" class="btn btn-primary" style="width: 100%; font-size: 1.3rem;">
+            🚀 เริ่มการผจญภัยเลย!
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- =========================================================
+         QUESTION MODAL (WITH PURE HTML/CSS FLOWCHART)
+         ========================================================= -->
+    <div id="question-modal" class="modal-overlay hidden">
+      <div class="modal-card">
+        <div class="modal-title">
+          <span>💎 คริสตัลตรรกะถูกปลดล็อค!</span>
+        </div>
+        <p class="modal-subtitle">พิจารณาผังงานและเงื่อนไข แล้วเลือกคำตอบที่ถูกต้องที่สุด</p>
+
+        <!-- Dynamic Flowchart HTML Area -->
+        <div id="flowchart-area" class="flowchart-container">
+          <!-- Populated by JS -->
+        </div>
+
+        <!-- Scenario Text -->
+        <div id="question-text" class="question-scenario">
+          <!-- Populated by JS -->
+        </div>
+
+        <!-- Multiple Choice Options -->
+        <div id="choices-container" class="choices-grid">
+          <!-- Populated by JS -->
+        </div>
+
+        <!-- Explanation area -->
+        <div id="answer-explanation" class="answer-explanation"></div>
+
+        <div id="question-actions" style="display: none; margin-top: 10px;">
+          <button id="btn-next-question" class="btn btn-success">
+            ลุยต่อเลย! 🏃💨
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- =========================================================
+         MINI-GAME MODAL (REORDER FLOWCHART)
+         ========================================================= -->
+    <div id="minigame-modal" class="modal-overlay hidden">
+      <div class="modal-card" style="max-width: 650px;">
+        <div class="modal-title">
+          <span>🧩 มินิเกม: ผู้พิทักษ์ผังงาน</span>
+        </div>
+        <p class="modal-subtitle" id="minigame-mission">
+          ภารกิจ: นำขั้นตอนที่กำหนดให้ มาเรียงลำดับผังงานให้ถูกต้องตั้งแต่เริ่มต้นจนสิ้นสุด!
+        </p>
+
+        <div class="minigame-pool-container">
+          <!-- Unordered Steps Pool -->
+          <div>
+            <div class="minigame-section-title">
+              <span>📦 ขั้นตอนที่ต้องนำไปเรียง (คลิกเพื่อเลือกเข้าผังงาน):</span>
+            </div>
+            <div id="minigame-source-pool" class="step-dropzone" style="min-height: 90px; background: #FEF3C7; border-color: #F59E0B;">
+              <!-- Source Cards -->
+            </div>
+          </div>
+
+          <!-- Ordered Sequence -->
+          <div>
+            <div class="minigame-section-title">
+              <span>📋 ผังงานที่กำลังจัดเรียง (คลิกที่การ์ดเพื่อนำออก):</span>
+            </div>
+            <div id="minigame-target-slots" class="step-dropzone" style="min-height: 140px; background: #EEF2FF; border-color: #818CF8;">
+              <!-- Target Cards with connection arrows -->
+            </div>
+          </div>
+        </div>
+
+        <div id="minigame-feedback" class="answer-explanation"></div>
+
+        <div style="display: flex; gap: 12px; justify-content: center; margin-top: 16px;">
+          <button id="btn-minigame-reset" class="btn btn-secondary" style="padding: 10px 20px;">
+            🔄 เริ่มเรียงใหม่
+          </button>
+          <button id="btn-minigame-check" class="btn btn-success" style="padding: 10px 24px;">
+            ✅ ตรวจคำตอบ!
+          </button>
+          <button id="btn-minigame-continue" class="btn btn-primary hidden" style="padding: 10px 24px;">
+            🎉 ยอดเยี่ยม! ไปต่อเลย
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- =========================================================
+         BOSS BATTLE MODAL
+         ========================================================= -->
+    <div id="boss-modal" class="modal-overlay hidden">
+      <div class="modal-card" style="max-width: 720px;">
+        <div class="boss-arena">
+          <div style="display: flex; justify-content: space-between; align-items: center;">
+            <div style="font-weight: 700; font-size: 1.15rem; color: #FCA5A5;">
+              👾 บอสไวรัสตรรกะ: "เจ้าบัก บั๊กซิลล่า (Bugzilla)"
+            </div>
+            <div id="boss-hp-text" style="font-weight: 700; color: #FDE68A;">
+              HP: 5 / 5
+            </div>
+          </div>
+
+          <div class="boss-sprite-container">
+            <div id="boss-sprite" class="boss-sprite">👾</div>
+            <div class="boss-quote" id="boss-speech">
+              "ฮ่าๆๆ! ข้าคือ Compiler Bugzilla เจ้าไม่มีทางแก้ Syntax และ Logic Error ใน Flowgorithm ได้หรอก!"
+            </div>
+          </div>
+
+          <div class="boss-hp-container">
+            <div class="boss-hp-bar">
+              <div id="boss-hp-fill" class="boss-hp-fill" style="width: 100%;"></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Boss Question Flowchart -->
+        <div id="boss-flowchart-area" class="flowchart-container" style="margin-top: 4px;"></div>
+
+        <!-- Boss Question Prompt -->
+        <div id="boss-question-text" class="question-scenario"></div>
+
+        <!-- Boss Choices -->
+        <div id="boss-choices-container" class="choices-grid"></div>
+
+        <!-- Boss Feedback -->
+        <div id="boss-feedback" class="answer-explanation"></div>
+
+        <div id="boss-actions" style="display: none; margin-top: 10px;">
+          <button id="btn-boss-next" class="btn btn-danger">
+            โจมตีบักต่อไป! ⚔️
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- =========================================================
+         GAME OVER MODAL
+         ========================================================= -->
+    <div id="game-over-modal" class="modal-overlay hidden">
+      <div class="modal-card">
+        <div style="font-size: 4rem; animation: shake 0.5s ease;">💔😢</div>
+        <h2 class="modal-title" style="color: #DC2626;">พลังชีวิตหมดแล้ว!</h2>
+        <p class="modal-subtitle">อย่าเพิ่งยอมแพ้นะ การเรียนรู้ตรรกะคือการลองผิดลองถูก แล้วกลับมาเก่งขึ้น!</p>
+
+        <div style="background: #FEE2E2; border-radius: 16px; padding: 14px; margin: 16px 0; color: #991B1B;">
+          💡 <strong>เคล็ดลับจากคุณครู:</strong> ก่อนตัดสินใจ ให้ดูที่สัญลักษณ์ผังงานและเงื่อนไข (ถ้า...แล้ว... หรือ และ/หรือ) ให้ถี่ถ้วนนะจ๊ะ
+        </div>
+
+        <div style="margin-top: 20px;">
+          <button id="btn-restart-game" class="btn btn-primary" style="font-size: 1.25rem;">
+            🔄 ลองใหม่อีกครั้ง
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- =========================================================
+         VICTORY / WIN MODAL
+         ========================================================= -->
+    <div id="win-modal" class="modal-overlay hidden">
+      <div class="modal-card">
+        <div style="font-size: 4rem; animation: bounce 1s infinite;">🏆👑🎉</div>
+        <h2 class="modal-title" style="color: #059669;">ยินดีด้วย! คุณพิชิตเมืองผังงาน Flowgorithm สำเร็จ!</h2>
+        <p class="modal-subtitle">สุดยอดมาก! คุณเชี่ยวชาญการออกแบบผังงานเงื่อนไข ตัวแปร และไวยากรณ์ Flowgorithm ระดับ ม.1 - ม.3 ได้อย่างสมบูรณ์แบบ</p>
+
+        <div style="background: #ECFDF5; border: 2px solid #A7F3D0; border-radius: 18px; padding: 16px; margin: 16px 0;">
+          <div style="font-size: 1.15rem; color: #065F46; font-weight: 700;">
+            โปรแกรมเมอร์: <span id="win-player-name">ผู้กล้า</span>
+          </div>
+          <div style="font-size: 2rem; color: #059669; font-weight: 700; margin: 6px 0;">
+            คะแนนรวม: <span id="win-final-score">0</span> คะแนน ⭐
+          </div>
+          <div style="font-size: 1.1rem; color: #047857;">
+            ระดับความสามารถ: ⭐⭐⭐ (ปรมาจารย์ผังงานและตรรกะคอมพิวเตอร์)
+          </div>
+        </div>
+
+        <!-- Badges earned -->
+        <div class="badges-grid">
+          <div class="badge-card">
+            <span class="badge-icon">🎖️</span>
+            <span class="badge-name">เซียน Flowgorithm</span>
+          </div>
+          <div class="badge-card">
+            <span class="badge-icon">💡</span>
+            <span class="badge-name">ตรรกะ IF-THEN-ELSE</span>
+          </div>
+          <div class="badge-card">
+            <span class="badge-icon">🛡️</span>
+            <span class="badge-name">ผู้พิชิต Compiler Bug</span>
+          </div>
+        </div>
+
+        <div style="margin-top: 20px;">
+          <button id="btn-play-again" class="btn btn-success" style="font-size: 1.25rem;">
+            ✨ เล่นอีกครั้งเพื่อทำสถิติใหม่!
+          </button>
+        </div>
+      </div>
+    </div>
+
+  </div> <!-- End #game-wrapper -->
+
+  <script>
+    /* =========================================================
+       2. SYNTHESIZED AUDIO FX (WEB AUDIO API - NO EXTERNAL FILES)
+       ========================================================= */
+    class SoundEngine {
+      constructor() {
+        this.ctx = null;
+        this.isMuted = false;
+      }
+
+      init() {
+        if (!this.ctx) {
+          const AudioContextClass = window.AudioContext || window.webkitAudioContext;
+          if (AudioContextClass) {
+            this.ctx = new AudioContextClass();
+          }
+        }
+        if (this.ctx && this.ctx.state === 'suspended') {
+          this.ctx.resume();
+        }
+      }
+
+      toggleMute() {
+        this.isMuted = !this.isMuted;
+        return !this.isMuted;
+      }
+
+      // Jump: rising frequency sine sweep
+      playJump() {
+        if (this.isMuted || !this.ctx) return;
+        const now = this.ctx.currentTime;
+        const osc = this.ctx.createOscillator();
+        const gain = this.ctx.createGain();
+
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(140, now);
+        osc.frequency.exponentialRampToValueAtTime(420, now + 0.14);
+
+        gain.gain.setValueAtTime(0.3, now);
+        gain.gain.linearRampToValueAtTime(0.01, now + 0.14);
+
+        osc.connect(gain);
+        gain.connect(this.ctx.destination);
+
+        osc.start(now);
+        osc.stop(now + 0.15);
+      }
+
+      // Crystal pickup: bright sparkling chime arpeggio
+      playCrystal() {
+        if (this.isMuted || !this.ctx) return;
+        const notes = [523.25, 659.25, 783.99, 1046.50]; // C5, E5, G5, C6
+        notes.forEach((freq, idx) => {
+          const now = this.ctx.currentTime + idx * 0.05;
+          const osc = this.ctx.createOscillator();
+          const gain = this.ctx.createGain();
+
+          osc.type = 'triangle';
+          osc.frequency.setValueAtTime(freq, now);
+
+          gain.gain.setValueAtTime(0.25, now);
+          gain.gain.exponentialRampToValueAtTime(0.001, now + 0.2);
+
+          osc.connect(gain);
+          gain.connect(this.ctx.destination);
+
+          osc.start(now);
+          osc.stop(now + 0.22);
+        });
+      }
+
+      // Correct answer fanfare: cheerful major chord progression
+      playCorrect() {
+        if (this.isMuted || !this.ctx) return;
+        const chords = [
+          { f: 523.25, d: 0.1, t: 0 },     // C5
+          { f: 659.25, d: 0.1, t: 0.08 },  // E5
+          { f: 783.99, d: 0.12, t: 0.16 }, // G5
+          { f: 1046.50, d: 0.35, t: 0.24 } // C6
+        ];
+        chords.forEach(c => {
+          const now = this.ctx.currentTime + c.t;
+          const osc = this.ctx.createOscillator();
+          const gain = this.ctx.createGain();
+
+          osc.type = 'sine';
+          osc.frequency.setValueAtTime(c.f, now);
+
+          gain.gain.setValueAtTime(0.3, now);
+          gain.gain.exponentialRampToValueAtTime(0.001, now + c.d);
+
+          osc.connect(gain);
+          gain.connect(this.ctx.destination);
+
+          osc.start(now);
+          osc.stop(now + c.d + 0.05);
+        });
+      }
+
+      // Wrong answer buzzer: low dissonant sawtooth sound
+      playWrong() {
+        if (this.isMuted || !this.ctx) return;
+        const now = this.ctx.currentTime;
+        const osc = this.ctx.createOscillator();
+        const gain = this.ctx.createGain();
+
+        osc.type = 'sawtooth';
+        osc.frequency.setValueAtTime(180, now);
+        osc.frequency.linearRampToValueAtTime(90, now + 0.25);
+
+        gain.gain.setValueAtTime(0.3, now);
+        gain.gain.linearRampToValueAtTime(0.01, now + 0.25);
+
+        osc.connect(gain);
+        gain.connect(this.ctx.destination);
+
+        osc.start(now);
+        osc.stop(now + 0.26);
+      }
+
+      // Boss Hit impact
+      playBossHit() {
+        if (this.isMuted || !this.ctx) return;
+        const now = this.ctx.currentTime;
+        const osc = this.ctx.createOscillator();
+        const gain = this.ctx.createGain();
+
+        osc.type = 'square';
+        osc.frequency.setValueAtTime(260, now);
+        osc.frequency.exponentialRampToValueAtTime(60, now + 0.2);
+
+        gain.gain.setValueAtTime(0.4, now);
+        gain.gain.linearRampToValueAtTime(0.01, now + 0.2);
+
+        osc.connect(gain);
+        gain.connect(this.ctx.destination);
+
+        osc.start(now);
+        osc.stop(now + 0.21);
+      }
+
+      // Victory fanfare
+      playVictory() {
+        if (this.isMuted || !this.ctx) return;
+        const notes = [440, 554, 659, 880, 1108];
+        notes.forEach((freq, idx) => {
+          const now = this.ctx.currentTime + idx * 0.12;
+          const osc = this.ctx.createOscillator();
+          const gain = this.ctx.createGain();
+
+          osc.type = 'triangle';
+          osc.frequency.setValueAtTime(freq, now);
+
+          gain.gain.setValueAtTime(0.35, now);
+          gain.gain.exponentialRampToValueAtTime(0.001, now + 0.4);
+
+          osc.connect(gain);
+          gain.connect(this.ctx.destination);
+
+          osc.start(now);
+          osc.stop(now + 0.45);
+        });
+      }
+
+      // Game Over sound
+      playGameOver() {
+        if (this.isMuted || !this.ctx) return;
+        const notes = [320, 280, 240, 190];
+        notes.forEach((freq, idx) => {
+          const now = this.ctx.currentTime + idx * 0.18;
+          const osc = this.ctx.createOscillator();
+          const gain = this.ctx.createGain();
+
+          osc.type = 'sawtooth';
+          osc.frequency.setValueAtTime(freq, now);
+
+          gain.gain.setValueAtTime(0.25, now);
+          gain.gain.linearRampToValueAtTime(0.01, now + 0.2);
+
+          osc.connect(gain);
+          gain.connect(this.ctx.destination);
+
+          osc.start(now);
+          osc.stop(now + 0.22);
+        });
+      }
+
+      // Simple UI click pop
+      playClick() {
+        if (this.isMuted || !this.ctx) return;
+        const now = this.ctx.currentTime;
+        const osc = this.ctx.createOscillator();
+        const gain = this.ctx.createGain();
+
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(600, now);
+        osc.frequency.exponentialRampToValueAtTime(300, now + 0.05);
+
+        gain.gain.setValueAtTime(0.2, now);
+        gain.gain.linearRampToValueAtTime(0.01, now + 0.05);
+
+        osc.connect(gain);
+        gain.connect(this.ctx.destination);
+
+        osc.start(now);
+        osc.stop(now + 0.06);
+      }
+    }
+
+    const sound = new SoundEngine();
+
+    /* =========================================================
+       3. QUESTION DATABASE (18 FLOWGORITHM QUESTIONS FOR M.1 - M.3)
+       Topics: Declare, Input, Assign, Output, If (Decision),
+       Data Types (Integer, Real, String, Boolean), Operators (==, !=, >, <, and, or, not, %)
+       ========================================================= */
+    const QUESTION_BANK = [
+      {
+        id: 1,
+        topic: 'การประกาศตัวแปร (Declare) และชนิดข้อมูล',
+        flowchart: {
+          main: 'Main',
+          declare: 'Declare Integer score',
+          input: 'Input score',
+          decision: 'score >= 50',
+          trueBranch: 'Output "ผ่านเกณฑ์"',
+          falseBranch: 'Output "ไม่ผ่าน"',
+          end: 'End',
+          codePreview: 'score = int(input())\nif score >= 50:\n    print("ผ่านเกณฑ์")\nelse:\n    print("ไม่ผ่าน")'
+        },
+        scenario: 'ในโปรแกรม Flowgorithm ก่อนจะนำตัวแปร "score" มารับค่าในบล็อก Input เพื่อเก็บคะแนนสอบที่เป็นเลขจำนวนเต็ม (เช่น 85) เราต้องใช้สัญลักษณ์ใดในการประกาศตัวแปร และเลือก Type ใด?',
+        choices: [
+          { text: 'สัญลักษณ์ Declare (กล่องสีเหลือง) และเลือก Type: Integer', correct: true },
+          { text: 'สัญลักษณ์ Assign (กล่องสีส้ม) และเลือก Type: String', correct: false },
+          { text: 'สัญลักษณ์ Output (กล่องสีเขียว) และเลือก Type: Boolean', correct: false },
+          { text: 'ไม่ต้องประกาศตัวแปร สามารถใช้บล็อก Input ได้เลยทันที', correct: false }
+        ],
+        explanation: 'ถูกต้องยอดเยี่ยม! กฎเหล็กของ Flowgorithm คือต้อง "Declare" ตัวแปรก่อนใช้งานเสมอ โดยจำนวนเต็มใช้ Integer, ทศนิยมใช้ Real, ข้อความใช้ String และค่าจริง/เท็จใช้ Boolean'
+      },
+      {
+        id: 2,
+        topic: 'ตัวดำเนินการเปรียบเทียบความเท่ากัน (Relational Operator ==)',
+        flowchart: {
+          main: 'Main',
+          declare: 'Declare String password',
+          input: 'Input password',
+          decision: 'password == "pass1234"',
+          trueBranch: 'Output "ยินดีต้อนรับ"',
+          falseBranch: 'Output "รหัสผ่านไม่ถูกต้อง"',
+          end: 'End',
+          codePreview: 'if password == "pass1234":\n    print("ยินดีต้อนรับ")'
+        },
+        scenario: 'ในบล็อกตรวจสอบเงื่อนไข (If) ของ Flowgorithm หากต้องการเปรียบเทียบว่าค่าในตัวแปร password "เท่ากับ" คำว่า "pass1234" หรือไม่ ต้องใช้สัญลักษณ์ใดตามหลักไวยากรณ์?',
+        choices: [
+          { text: 'เครื่องหมาย == (เช่น password == "pass1234")', correct: true },
+          { text: 'เครื่องหมาย = ตัวเดียว (เช่น password = "pass1234")', correct: false },
+          { text: 'เครื่องหมาย equals', correct: false },
+          { text: 'เครื่องหมาย :=', correct: false }
+        ],
+        explanation: 'แม่นยำมาก! ใน Flowgorithm เครื่องหมาย = ตัวเดียวใช้กำหนดค่า (Assign) ส่วนการเปรียบเทียบว่าเท่ากันหรือไม่ ต้องใช้ == สองตัวเสมอ'
+      },
+      {
+        id: 3,
+        topic: 'ตัวดำเนินการทางตรรกะ AND (และ)',
+        flowchart: {
+          main: 'Main',
+          declare: ['Declare Integer age', 'Declare Real gpa'],
+          decision: '(age >= 13) and (gpa >= 3.00)',
+          trueBranch: 'Output "ผ่านเข้าค่าย"',
+          falseBranch: 'Output "ไม่ผ่านเกณฑ์"',
+          end: 'End',
+          codePreview: 'if (age >= 13) and (gpa >= 3.00):\n    print("ผ่านเข้าค่าย")'
+        },
+        scenario: 'เงื่อนไขคัดเลือกเข้าค่ายคอมพิวเตอร์: (age >= 13) and (gpa >= 3.00) ถ้านักเรียนคนหนึ่ง "อายุ 14 ปี" แต่ "ได้เกรดเฉลี่ย (GPA) 2.80" ผังงานจะส่งผลลัพธ์ใด?',
+        choices: [
+          { text: 'Output "ไม่ผ่านเกณฑ์" (เพราะเงื่อนไข and ต้องเป็นจริงทั้งสองฝั่ง)', correct: true },
+          { text: 'Output "ผ่านเข้าค่าย" (เพราะอายุ 14 ปี ผ่านเกณฑ์แล้ว)', correct: false },
+          { text: 'เกิดข้อผิดพลาด Syntax Error', correct: false },
+          { text: 'โปรแกรมจะวนถามเกรดใหม่อีกรอบ', correct: false }
+        ],
+        explanation: 'ถูกต้อง! ตรรกะ "and" ใน Flowgorithm จะเป็นจริง (True) เมื่อเงื่อนไขทั้งสองฝั่งเป็นจริงพร้อมกัน แม้อายุจะผ่าน แต่ GPA ไม่ถึง จึงเป็นเท็จ (False)'
+      },
+      {
+        id: 4,
+        topic: 'การหาเศษด้วย Modulo (%) เพื่อตรวจเลขคู่/เลขคี่',
+        flowchart: {
+          main: 'Main',
+          declare: 'Declare Integer n',
+          input: 'Input n',
+          decision: 'n % 2 == 0',
+          trueBranch: 'Output "เลขคู่ (Even)"',
+          falseBranch: 'Output "เลขคี่ (Odd)"',
+          end: 'End',
+          codePreview: 'if n % 2 == 0:\n    print("Even")\nelse:\n    print("Odd")'
+        },
+        scenario: 'ผู้ใช้ป้อนค่า n = 27 เข้าสู่ผังงาน Flowgorithm นิพจน์เงื่อนไข n % 2 == 0 จะได้ค่าจริงหรือเท็จ และแสดงข้อความใด?',
+        choices: [
+          { text: 'ได้ค่า False แสดงผล "เลขคี่ (Odd)" เพราะ 27 หาร 2 เหลือเศษ 1', correct: true },
+          { text: 'ได้ค่า True แสดงผล "เลขคู่ (Even)"', correct: false },
+          { text: 'แสดงผลเป็นตัวเลข 13.5', correct: false },
+          { text: 'เกิด Error เพราะห้ามใช้เครื่องหมาย % ในบล็อก If', correct: false }
+        ],
+        explanation: 'ยอดเยี่ยม! เครื่องหมาย % (Modulo) คือการหาเศษจากการหาร 27 หาร 2 ได้ 13 เหลือเศษ 1 ซึ่ง 1 != 0 ทำให้เงื่อนไขเป็นเท็จ จึงสรุปว่าเป็นเลขคี่'
+      },
+      {
+        id: 5,
+        topic: 'ตัวดำเนินการทางตรรกะ OR (หรือ) สิทธิส่วนลด',
+        flowchart: {
+          main: 'Main',
+          declare: ['Declare Boolean isVIP', 'Declare Real total'],
+          decision: '(isVIP == true) or (total >= 1000)',
+          trueBranch: 'Output "รับส่วนลด 15%"',
+          falseBranch: 'Output "จ่ายราคาเต็ม"',
+          end: 'End',
+          codePreview: 'if isVIP or (total >= 1000):\n    print("Discount 15%")'
+        },
+        scenario: 'ลูกค้าคนหนึ่ง "ไม่ได้เป็นสมาชิก VIP (isVIP = false)" แต่ "มียอดซื้อสินค้า total = 1,500 บาท" ผังงาน Flowgorithm จะทำงานไปทางกิ่งใด?',
+        choices: [
+          { text: 'กิ่ง True ได้รับส่วนลด 15% (เพราะตรรกะ or ขอแค่จริงอย่างน้อย 1 เงื่อนไข)', correct: true },
+          { text: 'กิ่ง False จ่ายราคาเต็ม เพราะไม่ใช่สมาชิก VIP', correct: false },
+          { text: 'ระบบหยุดทำงานเพราะไม่มีสถานะ VIP', correct: false },
+          { text: 'ระบบคิดส่วนลดให้เพียง 5%', correct: false }
+        ],
+        explanation: 'เป๊ะมาก! ตัวดำเนินการ "or" ใน Flowgorithm ขอเพียงแค่เงื่อนไขใดเงื่อนไขหนึ่งเป็นจริง นิพจน์รวมจะเป็นจริงทันที ยอดซื้อ 1,500 >= 1000 จึงได้รับส่วนลด'
+      },
+      {
+        id: 6,
+        topic: 'สัญลักษณ์สี่เหลี่ยมด้านขนาน (Parallelogram) ใน Flowgorithm',
+        flowchart: {
+          customHtml: `
+            <div style="display: flex; gap: 14px; align-items: center; justify-content: center; flex-wrap: wrap;">
+              <div class="fg-input-box"><span>Input score</span></div>
+              <span style="font-weight: 700; color: #64748B;">vs</span>
+              <div class="fg-output-box"><span>Output "Pass"</span></div>
+            </div>
+          `
+        },
+        scenario: 'ในโปรแกรม Flowgorithm สัญลักษณ์รูปสี่เหลี่ยมด้านขนาน (Parallelogram) สีฟ้า และ สีเขียว มีหน้าที่แตกต่างกันอย่างไร?',
+        choices: [
+          { text: 'สีฟ้าใช้สำหรับ Input (รับค่า) และสีเขียวใช้สำหรับ Output (แสดงผล)', correct: true },
+          { text: 'สีฟ้าใช้สำหรับคำนวณสูตร และสีเขียวใช้เริ่มโปรแกรม', correct: false },
+          { text: 'สีฟ้าใช้ตัดสินใจ และสีเขียวใช้ประกาศตัวแปร', correct: false },
+          { text: 'ทั้งสองสีใช้แทนคำสั่งเหมือนกัน สามารถใช้สลับกันได้', correct: false }
+        ],
+        explanation: 'ถูกต้องที่สุด! สี่เหลี่ยมด้านขนานคือสัญลักษณ์ I/O (Input/Output) โดย Flowgorithm ใช้สีฟ้าแทน Input และสีเขียวแทน Output เพื่อให้ผู้เรียนสังเกตได้ง่าย'
+      },
+      {
+        id: 7,
+        topic: 'การเชื่อมข้อความ (String Concatenation) ด้วยเครื่องหมาย &',
+        flowchart: {
+          main: 'Main',
+          assign: 'Assign score = 95',
+          trueBranch: 'Output "คะแนน: " & score',
+          end: 'End',
+          codePreview: 'Output "คะแนน: " & score'
+        },
+        scenario: 'ในบล็อก Output ของ Flowgorithm หากต้องการแสดงข้อความร่วมกับค่าของตัวแปร เช่น "คะแนน: 95" เราต้องใช้สัญลักษณ์ใดในการเชื่อมข้อความ?',
+        choices: [
+          { text: 'เครื่องหมาย & (Ampersand) เช่น "คะแนน: " & score', correct: true },
+          { text: 'เครื่องหมาย + เช่น "คะแนน: " + score', correct: false },
+          { text: 'เครื่องหมาย , (คอมม่า)', correct: false },
+          { text: 'เครื่องหมาย . (จุด)', correct: false }
+        ],
+        explanation: 'เยี่ยมยอด! Flowgorithm ใช้เครื่องหมาย & ในการเชื่อมข้อความ (String Concatenation) กับตัวแปรเข้าด้วยกัน'
+      },
+      {
+        id: 8,
+        topic: 'กฎการตั้งชื่อตัวแปร (Variable Naming Rules)',
+        flowchart: {
+          main: 'Main',
+          declare: 'Declare Integer student_age',
+          end: 'End'
+        },
+        scenario: 'ข้อใดต่อไปนี้ตั้งชื่อตัวแปรใน Flowgorithm ได้ "ถูกต้องตามหลักไวยากรณ์" และไม่เกิดข้อผิดพลาด Syntax Error?',
+        choices: [
+          { text: 'student_age (ขึ้นต้นด้วยตัวอักษร และใช้ขีดล่างได้)', correct: true },
+          { text: '2nd_score (ขึ้นต้นด้วยตัวเลข)', correct: false },
+          { text: 'total score (มีช่องว่างเว้นวรรคระหว่างคำ)', correct: false },
+          { text: 'price#bath (มีอักขระพิเศษ)', correct: false }
+        ],
+        explanation: 'ถูกต้อง! กฎการตั้งชื่อตัวแปรใน Flowgorithm ต้องขึ้นต้นด้วยตัวอักษรภาษาอังกฤษ ห้ามเว้นวรรค และห้ามใช้อักขระพิเศษ ยกเว้น _ (Underscore)'
+      },
+      {
+        id: 9,
+        topic: 'ชนิดข้อมูล Real vs Integer ในการคำนวณ',
+        flowchart: {
+          main: 'Main',
+          declare: ['Declare Real weight, height, bmi'],
+          assign: 'Assign bmi = weight / (height * height)',
+          decision: 'bmi >= 23.0',
+          trueBranch: 'Output "น้ำหนักเกินเกณฑ์"',
+          falseBranch: 'Output "น้ำหนักสมส่วน"',
+          end: 'End'
+        },
+        scenario: 'ในการสร้างผังงานคำนวณค่าดัชนีมวลกาย (BMI) ซึ่งมีผลลัพธ์เป็นตัวเลขทศนิยม (เช่น 21.75) เราต้องประกาศตัวแปร bmi ด้วย Type ใดใน Flowgorithm?',
+        choices: [
+          { text: 'Real (จำนวนจริงที่มีทศนิยม)', correct: true },
+          { text: 'Integer (จำนวนเต็ม)', correct: false },
+          { text: 'String (ข้อความ)', correct: false },
+          { text: 'Boolean (จริง/เท็จ)', correct: false }
+        ],
+        explanation: 'แม่นยำ! ใน Flowgorithm ชนิดข้อมูล Real ใช้สำหรับเก็บตัวเลขทศนิยม หากเลือก Integer เศษทศนิยมจะถูกตัดทิ้ง ทำให้ค่าคลาดเคลื่อน'
+      },
+      {
+        id: 10,
+        topic: 'ตัวดำเนินการทางตรรกะ NOT (นิเสธ/ปฏิเสธ)',
+        flowchart: {
+          main: 'Main',
+          declare: 'Declare Boolean isRaining',
+          assign: 'Assign isRaining = false',
+          decision: 'not(isRaining)',
+          trueBranch: 'Output "ไปเตะฟุตบอลที่สนาม ⚽"',
+          falseBranch: 'Output "เล่นเกมในบ้าน 🎮"',
+          end: 'End',
+          codePreview: 'if not isRaining:\n    print("เตะฟุตบอล")'
+        },
+        scenario: 'กำหนดให้ตัวแปร isRaining = false (ฝนไม่ตก) นิพจน์เงื่อนไข not(isRaining) ในบล็อก If จะให้ผลลัพธ์ใด?',
+        choices: [
+          { text: 'ให้ผลเป็น True ไปเตะฟุตบอล (เพราะ not(false) กลายเป็น true)', correct: true },
+          { text: 'ให้ผลเป็น False เล่นเกมในบ้าน', correct: false },
+          { text: 'เกิด Error เพราะห้ามใช้ not กับ Boolean', correct: false },
+          { text: 'โปรแกรมข้ามบล็อก If ไปที่ End ทันที', correct: false }
+        ],
+        explanation: 'เก่งมาก! ตัวดำเนินการ "not" จะกลับค่าความจริง จาก false กลายเป็น true ดังนั้นเงื่อนไขจึงเป็นจริง ไปเตะฟุตบอลได้!'
+      },
+      {
+        id: 11,
+        topic: 'โครงสร้างแบบทางเลือกซ้อน (Nested If) ตัดเกรด',
+        flowchart: {
+          main: 'Main',
+          declare: 'Declare Integer score',
+          decision: 'score >= 80',
+          trueBranch: 'Output "เกรด 4"',
+          falseBranch: 'If score >= 70 (เกรด 3) ...',
+          end: 'End',
+          codePreview: 'if score >= 80:\n    print("Grade 4")\nelif score >= 70:\n    print("Grade 3")'
+        },
+        scenario: 'ถ้าผู้ใช้ป้อนคะแนน score = 75 เข้าสู่ผังงานแบบ Nested If การทำงานของ Flowgorithm จะเป็นอย่างไร?',
+        choices: [
+          { text: 'เงื่อนไขแรก (>= 80) เป็นเท็จ จึงตรวจเงื่อนไขถัดไป (>= 70) ซึ่งเป็นจริง ได้เกรด 3', correct: true },
+          { text: 'ได้ทั้งเกรด 4 และเกรด 3 พร้อมกัน', correct: false },
+          { text: 'ข้ามไปทำคำสั่ง End โดยไม่ได้เกรด', correct: false },
+          { text: 'เกิด Error เพราะบล็อก If ซ้อนกันไม่ได้', correct: false }
+        ],
+        explanation: 'ยอดเยี่ยม! โครงสร้าง Nested If จะตรวจเงื่อนไขแรกก่อน เมื่อไม่เข้าเกณฑ์ (75 < 80) จะส่งต่อไปกิ่ง False เพื่อตรวจเงื่อนไข 75 >= 70 ซึ่งเป็นจริง ได้เกรด 3'
+      },
+      {
+        id: 12,
+        topic: 'การเขียนช่วงเงื่อนไข (Range Condition) ในภาษาคอมพิวเตอร์',
+        flowchart: {
+          main: 'Main',
+          decision: '(score >= 50) and (score < 60)',
+          trueBranch: 'Output "เกรด 1"',
+          falseBranch: 'Output "ไม่ใช่ช่วงเกรด 1"',
+          end: 'End'
+        },
+        scenario: 'ใน Flowgorithm หากต้องการเขียนเงื่อนไขว่า "คะแนนอยู่ระหว่าง 50 ถึง 59 คะแนน" ข้อใดเขียนนิพจน์ได้ถูกต้องตามหลักภาษาโปรแกรม?',
+        choices: [
+          { text: '(score >= 50) and (score < 60)', correct: true },
+          { text: '50 <= score < 60 (แบบคณิตศาสตร์)', correct: false },
+          { text: 'score >= 50 or < 60', correct: false },
+          { text: 'between(score, 50, 60)', correct: false }
+        ],
+        explanation: 'ถูกต้องที่สุด! ใน Flowgorithm และภาษาเขียนโปรแกรมสากล เราไม่สามารถเขียนรวบ 50 <= score < 60 ได้ ต้องแยกเป็น 2 เงื่อนไขแล้วเชื่อมด้วย and'
+      },
+      {
+        id: 13,
+        topic: 'ตารางไล่ค่าตัวแปร (Trace Table) และการคำนวณ',
+        flowchart: {
+          main: 'Main',
+          declare: ['Declare Integer a', 'Declare Integer b'],
+          assign: 'Assign a = 12, b = 4',
+          decision: 'a > b',
+          trueBranch: 'Assign a = a - b',
+          falseBranch: 'Assign a = a + b',
+          end: 'Output a'
+        },
+        scenario: 'กำหนดค่าเริ่มต้น a = 12 และ b = 4 จากผังงานนี้ เมื่อสิ้นสุดการทำงาน ค่าที่แสดงในบล็อก Output a จะมีค่าเท่ากับเท่าใด?',
+        choices: [
+          { text: '8 (เพราะ 12 > 4 เป็นจริง ค่า a จึงถูกคำนวณใหม่เป็น 12 - 4 = 8)', correct: true },
+          { text: '16', correct: false },
+          { text: '12', correct: false },
+          { text: '4', correct: false }
+        ],
+        explanation: 'เก่งมาก! เมื่อ a = 12 และ b = 4 เงื่อนไข a > b เป็นจริง โปรแกรมจึงทำกิ่ง True คือ a = a - b (12 - 4 = 8) ค่าผลลัพธ์สุดท้ายจึงเป็น 8'
+      },
+      {
+        id: 14,
+        topic: 'ตัวดำเนินการเปรียบเทียบไม่เท่ากับ (!=)',
+        flowchart: {
+          main: 'Main',
+          declare: 'Declare String cmd',
+          input: 'Input cmd',
+          decision: 'cmd != "exit"',
+          trueBranch: 'Output "ทำงานต่อไป"',
+          falseBranch: 'Output "จบโปรแกรม"',
+          end: 'End'
+        },
+        scenario: 'ในบล็อกเงื่อนไข If ของ Flowgorithm เครื่องหมาย != มีความหมายตรงกับข้อใด?',
+        choices: [
+          { text: 'ไม่เท่ากับ (Not Equal To)', correct: true },
+          { text: 'น้อยกว่าหรือเท่ากับ', correct: false },
+          { text: 'เป็นเครื่องหมายแจ้งเตือนคำสั่งผิด', correct: false },
+          { text: 'ค่าคงที่ห้ามเปลี่ยนแปลง', correct: false }
+        ],
+        explanation: 'ถูกต้อง! เครื่องหมาย != ใช้สำหรับตรวจสอบว่าค่าของสองฝั่ง "ไม่เท่ากัน" ถ้าค่าไม่เท่ากันจริงจะให้ผลลัพธ์เป็น True'
+      },
+      {
+        id: 15,
+        topic: 'ชนิดข้อมูล Boolean (ค่าความจริง)',
+        flowchart: {
+          main: 'Main',
+          declare: 'Declare Boolean isPassed',
+          assign: 'Assign isPassed = true',
+          decision: 'isPassed == true',
+          trueBranch: 'Output "ยินดีด้วย คุณสอบผ่าน"',
+          end: 'End'
+        },
+        scenario: 'ตัวแปรชนิด "Boolean" ในโปรแกรม Flowgorithm สามารถเก็บข้อมูลได้เพียง 2 ค่าเท่านั้น คือข้อใด?',
+        choices: [
+          { text: 'true และ false (จริง และ เท็จ)', correct: true },
+          { text: '0 และ 100', correct: false },
+          { text: '"yes" และ "no"', correct: false },
+          { text: 'pass และ fail', correct: false }
+        ],
+        explanation: 'แม่นยำมาก! Boolean คือชนิดข้อมูลเชิงตรรกศาสตร์ที่เก็บได้เพียง 2 สถานะคือ true (จริง) หรือ false (เท็จ) เท่านั้น'
+      },
+      {
+        id: 16,
+        topic: 'ข้อผิดพลาด Type Mismatch (ชนิดข้อมูลไม่ตรงกัน)',
+        flowchart: {
+          main: 'Main',
+          declare: 'Declare Integer age',
+          assign: 'Assign age = "สิบห้าปี"',
+          end: 'End'
+        },
+        scenario: 'หากนักเรียนประกาศ Declare Integer age แล้วใช้บล็อก Assign สั่งให้ age = "สิบห้าปี" เมื่อกด Run ใน Flowgorithm จะเกิดสิ่งใดขึ้น?',
+        choices: [
+          { text: 'เกิดข้อผิดพลาด Type Mismatch เพราะนำข้อความ (String) ไปใส่ในตัวแปรตัวเลข (Integer)', correct: true },
+          { text: 'โปรแกรมแปลงข้อความเป็นตัวเลข 15 ให้อัตโนมัติ', correct: false },
+          { text: 'ตัวแปร age จะกลายเป็นค่า 0', correct: false },
+          { text: 'โปรแกรมทำงานผ่านได้ตามปกติ', correct: false }
+        ],
+        explanation: 'ถูกต้อง! Flowgorithm มีระบบตรวจสอบชนิดข้อมูลที่เข้มงวด การนำค่าคนละ Type มากำหนดให้กันจะฟ้อง Type Mismatch Error ทันที'
+      },
+      {
+        id: 17,
+        topic: 'การประเมินตรรกะเงื่อนไขผสม (Compound Logic)',
+        flowchart: {
+          main: 'Main',
+          decision: '(hasKey == true) and ((level >= 10) or (hasMagic == true))',
+          trueBranch: 'Output "เปิดประตูเวทมนตร์สำเร็จ 🚪✨"',
+          falseBranch: 'Output "ประตูล็อคแน่นหนา 🔒"',
+          end: 'End'
+        },
+        scenario: 'ผู้เล่นมีคุณสมบัติ: hasKey = true, level = 8, hasMagic = true ถามว่าผังงานนี้จะให้ผลลัพธ์เปิดประตูสำเร็จหรือไม่?',
+        choices: [
+          { text: 'เปิดประตูสำเร็จ เพราะ hasKey เป็นจริง และในวงเล็บ or เป็นจริง (มี hasMagic)', correct: true },
+          { text: 'ประตูล็อค เพราะ level ยังไม่ถึง 10', correct: false },
+          { text: 'เกิด Error เพราะใส่วงเล็บซ้อนกันไม่ได้', correct: false },
+          { text: 'ต้องมีทั้ง level >= 10 และ hasMagic ถึงจะเปิดได้', correct: false }
+        ],
+        explanation: 'เก่งกาจมาก! ในวงเล็บ (level >= 10 or hasMagic) เป็นจริงเพราะ hasMagic = true และเมื่อเชื่อมด้วย and กับ hasKey ที่เป็นจริง จึงเป็นจริงทั้งประโยค'
+      },
+      {
+        id: 18,
+        topic: 'ลำดับขั้นตอนที่ถูกต้องในการสร้างผังงาน Flowgorithm',
+        flowchart: {
+          main: 'Main',
+          declare: 'Declare Real price',
+          input: 'Input price',
+          decision: 'price >= 500',
+          trueBranch: 'Output "ได้คูปอง"',
+          end: 'End'
+        },
+        scenario: 'ในการสร้างผังงานเพื่อรับค่าราคาและตรวจสอบเงื่อนไข ข้อใดเรียงลำดับบล็อกใน Flowgorithm ได้ถูกต้องและทำงานได้จริง?',
+        choices: [
+          { text: 'Main -> Declare -> Input -> If -> End', correct: true },
+          { text: 'Main -> Input -> Declare -> If -> End', correct: false },
+          { text: 'Main -> If -> Input -> Declare -> End', correct: false },
+          { text: 'Main -> Declare -> If -> End -> Input', correct: false }
+        ],
+        explanation: 'ยอดเยี่ยมที่สุด! กฎของ Flowgorithm คือต้องประกาศตัวแปร (Declare) ก่อนเสมอ จากนั้นจึงรับค่าเข้า (Input) แล้วนำไปตรวจสอบเงื่อนไข (If)'
+      }
+    ];
+
+    /* =========================================================
+       4. BOSS QUESTIONS (DEBUGGING FLOWGORITHM: COMPILER BUGZILLA)
+       Topics: Detect Syntax & Logic Bugs in Flowgorithm
+       ========================================================= */
+    const BOSS_QUESTIONS = [
+      {
+        topic: 'บอสข้อที่ 1: ตรวจจับ Bug ตัวดำเนินการเปรียบเทียบใน If',
+        flowchart: {
+          main: 'Main',
+          declare: 'Declare Integer score',
+          input: 'Input score',
+          decision: 'score = 100 ⚠️ (ตรวจพบ Bug!)',
+          trueBranch: 'Output "Perfect Score"',
+          end: 'End',
+          codePreview: '// Flowgorithm Error:\n// Expression contains single = instead of =='
+        },
+        scenario: 'บอสไวรัสบั๊กซิลล่าแอบเขียนบล็อก If ว่า "score = 100" โปรแกรมเมอร์ ม.ต้น ช่วยหาจุดผิดที่ทำให้ Flowgorithm รันไม่ผ่านที!',
+        choices: [
+          { text: 'ในบล็อก If ต้องใช้ == (เปรียบเทียบ) ไม่ใช่ = ตัวเดียว (กำหนดค่า)', correct: true },
+          { text: 'ต้องเปลี่ยนชื่อตัวแปร score เป็นตัวเลข', correct: false },
+          { text: 'ห้ามใส่เลข 100 ในบล็อกเงื่อนไข', correct: false }
+        ],
+        explanation: 'ถูกต้อง! การเปรียบเทียบใน Flowgorithm ต้องใช้ == สองตัว เครื่องหมาย = ตัวเดียวใช้เฉพาะในบล็อก Assign เท่านั้น!'
+      },
+      {
+        topic: 'บอสข้อที่ 2: ตรวจจับ Bug ลืม Declare ตัวแปรก่อนใช้งาน',
+        flowchart: {
+          main: 'Main',
+          input: 'Input age ⚠️ (ยังไม่ได้ Declare!)',
+          decision: 'age >= 18',
+          trueBranch: 'Output "ผู้ใหญ่"',
+          end: 'End'
+        },
+        scenario: 'ในผังงานนี้ ผู้ออกแบบลากบล็อก Input age เข้ามาใช้งานทันทีโดยไม่มีบล็อก Declare ด้านบน จะเกิดสิ่งใดขึ้นเมื่อกดปุ่ม Run?',
+        choices: [
+          { text: 'เกิด Error ทันที: "Variable \'age\' was not declared" ต้องเพิ่มบล็อก Declare Integer age ก่อน', correct: true },
+          { text: 'โปรแกรมรันผ่านปกติ เพราะ Flowgorithm รู้จักตัวแปรอัตโนมัติ', correct: false },
+          { text: 'โปรแกรมจะตั้งค่า age ให้เท่ากับ 0 เสมอ', correct: false }
+        ],
+        explanation: 'แม่นยำมาก! Flowgorithm บังคับว่าต้องมีบล็อก Declare ตัวแปรก่อนจะเรียกใช้ใน Input หรือ Assign เสมอ!'
+      },
+      {
+        topic: 'บอสข้อที่ 3: ตรวจจับ Bug ไวยากรณ์เงื่อนไขช่วงคะแนน',
+        flowchart: {
+          main: 'Main',
+          declare: 'Declare Integer x',
+          decision: 'x > 10 and < 20 ⚠️ (ตรวจพบ Bug!)',
+          trueBranch: 'Output "In Range"',
+          end: 'End'
+        },
+        scenario: 'บั๊กซิลล่าเขียนเงื่อนไขว่า "x > 10 and < 20" ทำไม Flowgorithm ถึงฟ้อง Error และต้องแก้อย่างไรให้ถูกต้อง?',
+        choices: [
+          { text: 'หลังคำว่า and ต้องระบุชื่อตัวแปรซ้ำด้วย เป็น: (x > 10) and (x < 20)', correct: true },
+          { text: 'ต้องเปลี่ยน and เป็น or', correct: false },
+          { text: 'ต้องเปลี่ยนเป็น x > 10 < 20', correct: false }
+        ],
+        explanation: 'ยอดเยี่ยม! ตัวดำเนินการ and ต้องเชื่อมประโยคเงื่อนไขที่สมบูรณ์ทั้งสองฝั่ง จึงต้องเขียนเป็น (x > 10) and (x < 20)'
+      },
+      {
+        topic: 'บอสข้อที่ 4: ตรวจจับ Logic Bug ต่อสาย True/False สลับทาง',
+        flowchart: {
+          main: 'Main',
+          declare: 'Declare Integer score',
+          decision: 'score >= 50',
+          trueBranch: 'Output "สอบตก" ⚠️',
+          falseBranch: 'Output "สอบผ่าน" ⚠️',
+          end: 'End'
+        },
+        scenario: 'โปรแกรมนี้รันผ่านไม่ติด Syntax Error แต่ตรวจพบ Logic Bug (ข้อผิดพลาดเชิงตรรกะ) จุดผิดร้ายแรงของผังงานนี้คือข้อใด?',
+        choices: [
+          { text: 'ต่อสายสลับทาง! ถ้า score >= 50 เป็นจริง ต้องแสดง "สอบผ่าน" ไม่ใช่ "สอบตก"', correct: true },
+          { text: 'ห้ามใช้เลข 50 เป็นเกณฑ์ผ่าน', correct: false },
+          { text: 'ตัวแปร score ต้องเป็น String', correct: false }
+        ],
+        explanation: 'เฉียบคมมาก! นี่คือ Logic Error โปรแกรมรันได้แต่ผลลัพธ์ผิด เพราะสลับผลลัพธ์ระหว่างกิ่ง True และ False!'
+      },
+      {
+        topic: 'บอสข้อที่ 5: หมัดเผด็จศึกบอส! ประเมินเงื่อนไขกำจัด Bugzilla',
+        flowchart: {
+          main: 'Main',
+          decision: '(bossHP <= 1) and ((hasLogicSword == true) or (iqScore > 120))',
+          trueBranch: 'Output "พิชิต Bugzilla สำเร็จ! ระบบปลอดภัย 100% 🏆✨"',
+          falseBranch: 'Output "บอสหลบการโจมตีได้"',
+          end: 'End'
+        },
+        scenario: 'ตอนนี้บอสเหลือ bossHP = 1 และคุณมี hasLogicSword = true ผังงานเผด็จศึกนี้จะประเมินค่าความจริงและแสดงผลลัพธ์ใด?',
+        choices: [
+          { text: 'เงื่อนไขเป็นจริง ปล่อยพลังพิชิต Bugzilla กำจัดบั๊กสำเร็จเด็ดขาด! 🏆', correct: true },
+          { text: 'เงื่อนไขเป็นเท็จ บอสหลบได้เพราะ iqScore ยังไม่ถึง 120', correct: false },
+          { text: 'โปรแกรมหยุดทำงานกะทันหัน', correct: false }
+        ],
+        explanation: 'ไชโยยยย! bossHP <= 1 เป็นจริง และในวงเล็บ or เป็นจริง ทำให้ทั้งนิพจน์เป็น True เอาชนะเจ้าบักคอมไพเลอร์ได้สำเร็จ!'
+      }
+    ];
+
+    /* =========================================================
+       5. MINI-GAME DATA: FLOWGORMITH BLOCK SEQUENCING (M.1 - M.3)
+       ========================================================= */
+    const MINIGAME_SCENARIOS = [
+      {
+        title: 'จัดเรียงผังงาน Flowgorithm: ระบบตัดเกรดผ่าน/ไม่ผ่าน',
+        mission: 'นำบล็อกคำสั่ง Flowgorithm ทั้ง 6 บล็อกนี้ มาเรียงลำดับให้ถูกต้องตามหลักไวยากรณ์ตั้งแต่ Main จนถึง End!',
+        correctOrder: [
+          'Main (จุดเริ่มต้น)',
+          'Declare Integer score (ประกาศตัวแปร)',
+          'Input score (รับค่าคะแนน)',
+          'If score >= 50 (ตรวจสอบเงื่อนไข)',
+          'Output "Pass" (True) / Output "Fail" (False)',
+          'End (จุดสิ้นสุด)'
+        ],
+        pool: [
+          'If score >= 50 (ตรวจสอบเงื่อนไข)',
+          'Main (จุดเริ่มต้น)',
+          'Output "Pass" (True) / Output "Fail" (False)',
+          'Declare Integer score (ประกาศตัวแปร)',
+          'End (จุดสิ้นสุด)',
+          'Input score (รับค่าคะแนน)'
+        ]
+      },
+      {
+        title: 'จัดเรียงผังงาน Flowgorithm: ระบบคำนวณราคาส่วนลดสินค้า',
+        mission: 'จัดเรียงลำดับบล็อกคำนวณส่วนลดร้านค้า (Declare -> Input -> If -> Assign -> Output)',
+        correctOrder: [
+          'Main (จุดเริ่มต้น)',
+          'Declare Real price, total (ประกาศตัวแปรทศนิยม)',
+          'Input price (รับราคาสินค้า)',
+          'If price >= 500 (ถ้าซื้อครบ 500 บาท)',
+          'Assign total = price * 0.9 (คำนวณลด 10%)',
+          'Output "Total: " & total (แสดงยอดชำระ)',
+          'End (จุดสิ้นสุด)'
+        ],
+        pool: [
+          'Assign total = price * 0.9 (คำนวณลด 10%)',
+          'Main (จุดเริ่มต้น)',
+          'Input price (รับราคาสินค้า)',
+          'Output "Total: " & total (แสดงยอดชำระ)',
+          'Declare Real price, total (ประกาศตัวแปรทศนิยม)',
+          'End (จุดสิ้นสุด)',
+          'If price >= 500 (ถ้าซื้อครบ 500 บาท)'
+        ]
+      }
+    ];
+
+    /* =========================================================
+       6. GAME STATE & VARIABLES
+       ========================================================= */
+    const state = {
+      playerName: 'หนูน้อยนักคิด',
+      playerAvatar: '👦',
+      lives: 3,
+      score: 0,
+      currentLevel: 1,
+      totalLevels: 2,
+      crystalsCollected: 0,
+      crystalsRequired: 4,
+      isPaused: false,
+      gameStarted: false,
+      bossActive: false,
+      bossHP: 5,
+      bossMaxHP: 5,
+      currentBossQIndex: 0,
+      questionCursor: 0,
+      activeQuestion: null,
+      keys: { left: false, right: false, jump: false }
+    };
+
+    /* =========================================================
+       7. PLATFORMER ENGINE & CANVAS SETUP
+       ========================================================= */
+    const canvas = document.getElementById('gameCanvas');
+    const ctx = canvas.getContext('2d');
+
+    // Confetti canvas setup
+    const confCanvas = document.getElementById('confettiCanvas');
+    const confCtx = confCanvas.getContext('2d');
+
+    function resizeCanvases() {
+      const wrapper = document.getElementById('game-wrapper');
+      canvas.width = wrapper.clientWidth;
+      canvas.height = wrapper.clientHeight;
+      confCanvas.width = wrapper.clientWidth;
+      confCanvas.height = wrapper.clientHeight;
+    }
+    window.addEventListener('resize', resizeCanvases);
+
+    // Particle class for crystal sparkles and movement dust
+    class Particle {
+      constructor(x, y, color, vx, vy, size = 4, life = 1) {
+        this.x = x;
+        this.y = y;
+        this.color = color;
+        this.vx = vx;
+        this.vy = vy;
+        this.size = size;
+        this.life = life;
+        this.maxLife = life;
+      }
+      update() {
+        this.x += this.vx;
+        this.y += this.vy;
+        this.vy += 0.15; // gentle gravity
+        this.life -= 0.025;
+      }
+      draw(c, camX) {
+        c.save();
+        c.globalAlpha = Math.max(0, this.life / this.maxLife);
+        c.fillStyle = this.color;
+        c.beginPath();
+        c.arc(this.x - camX, this.y, this.size, 0, Math.PI * 2);
+        c.fill();
+        c.restore();
+      }
+    }
+
+    // Confetti Piece for celebrations
+    class Confetti {
+      constructor() {
+        this.x = Math.random() * confCanvas.width;
+        this.y = -20;
+        this.size = Math.random() * 8 + 6;
+        this.color = ['#F59E0B', '#10B981', '#3B82F6', '#EC4899', '#8B5CF6', '#EF4444'][Math.floor(Math.random() * 6)];
+        this.vx = (Math.random() - 0.5) * 4;
+        this.vy = Math.random() * 4 + 3;
+        this.rotation = Math.random() * 360;
+        this.rotSpeed = (Math.random() - 0.5) * 10;
+      }
+      update() {
+        this.x += this.vx;
+        this.y += this.vy;
+        this.rotation += this.rotSpeed;
+      }
+      draw(c) {
+        c.save();
+        c.translate(this.x, this.y);
+        c.rotate((this.rotation * Math.PI) / 180);
+        c.fillStyle = this.color;
+        c.fillRect(-this.size / 2, -this.size / 2, this.size, this.size);
+        c.restore();
+      }
+    }
+
+    let particles = [];
+    let confettiList = [];
+
+    function triggerConfetti(count = 70) {
+      for (let i = 0; i < count; i++) {
+        confettiList.push(new Confetti());
+      }
+    }
+
+    // Camera
+    const camera = { x: 0, y: 0 };
+
+    // Player Object with squash, stretch and physics
+    const player = {
+      x: 80,
+      y: 400,
+      width: 44,
+      height: 48,
+      vx: 0,
+      vy: 0,
+      speed: 0.65,
+      maxSpeed: 5.5,
+      friction: 0.84,
+      gravity: 0.55,
+      jumpForce: -13.5,
+      isGrounded: false,
+      scaleX: 1,
+      scaleY: 1,
+      facing: 1, // 1 for right, -1 for left
+      invulnerableTimer: 0,
+
+      reset(x = 80, y = 400) {
+        this.x = x;
+        this.y = y;
+        this.vx = 0;
+        this.vy = 0;
+        this.isGrounded = false;
+        this.scaleX = 1;
+        this.scaleY = 1;
+      },
+
+      update(platforms) {
+        // Horizontal Movement
+        if (state.keys.left) {
+          this.vx -= this.speed;
+          this.facing = -1;
+        } else if (state.keys.right) {
+          this.vx += this.speed;
+          this.facing = 1;
+        } else {
+          this.vx *= this.friction;
+        }
+
+        // Clamp speed
+        this.vx = Math.max(-this.maxSpeed, Math.min(this.maxSpeed, this.vx));
+        this.x += this.vx;
+
+        // Platform collision horizontal
+        // (basic boundary check)
+        if (this.x < 20) {
+          this.x = 20;
+          this.vx = 0;
+        }
+
+        // Vertical Movement & Gravity
+        this.vy += this.gravity;
+        this.y += this.vy;
+
+        // Check platforms collision
+        this.isGrounded = false;
+        for (const p of platforms) {
+          if (
+            this.x + this.width / 2 > p.x &&
+            this.x - this.width / 2 < p.x + p.w &&
+            this.y + this.height / 2 >= p.y &&
+            this.y + this.height / 2 <= p.y + p.h + this.vy + 2 &&
+            this.vy > 0
+          ) {
+            // Landing
+            if (!this.isGrounded) {
+              // Squash on landing
+              this.scaleX = 1.25;
+              this.scaleY = 0.75;
+              // Spawn dust particles
+              for (let i = 0; i < 4; i++) {
+                particles.push(new Particle(this.x, this.y + this.height / 2, '#CBD5E1', (Math.random() - 0.5) * 3, -Math.random() * 2, 3));
+              }
+            }
+            this.isGrounded = true;
+            this.vy = 0;
+            this.y = p.y - this.height / 2;
+          }
+        }
+
+        // Jump Handling
+        if (state.keys.jump && this.isGrounded) {
+          this.vy = this.jumpForce;
+          this.isGrounded = false;
+          // Stretch on jump
+          this.scaleX = 0.75;
+          this.scaleY = 1.3;
+          sound.playJump();
+
+          for (let i = 0; i < 4; i++) {
+            particles.push(new Particle(this.x, this.y + this.height / 2, '#93C5FD', (Math.random() - 0.5) * 2, 1, 3));
+          }
+        }
+
+        // Elastic return of squash/stretch
+        this.scaleX += (1 - this.scaleX) * 0.15;
+        this.scaleY += (1 - this.scaleY) * 0.15;
+
+        // Fall into pit handling
+        if (this.y > canvas.height + 150) {
+          handleFallPit();
+        }
+
+        // Invulnerability countdown
+        if (this.invulnerableTimer > 0) {
+          this.invulnerableTimer--;
+        }
+      },
+
+      draw(c, camX) {
+        c.save();
+        c.translate(this.x - camX, this.y);
+        c.scale(this.scaleX * this.facing, this.scaleY);
+
+        // Invulnerability flicker
+        if (this.invulnerableTimer > 0 && Math.floor(this.invulnerableTimer / 4) % 2 === 0) {
+          c.globalAlpha = 0.4;
+        }
+
+        // Draw shadow
+        c.fillStyle = 'rgba(0, 0, 0, 0.2)';
+        c.beginPath();
+        c.ellipse(0, this.height / 2, this.width / 2, 6, 0, 0, Math.PI * 2);
+        c.fill();
+
+        // Draw Emoji Character
+        c.font = '36px "Segoe UI Emoji", "Apple Color Emoji", sans-serif';
+        c.textAlign = 'center';
+        c.textBaseline = 'middle';
+        c.fillText(state.playerAvatar, 0, 0);
+
+        c.restore();
+
+        // Draw player name tag above head
+        c.save();
+        c.font = 'bold 12px var(--font-cute)';
+        c.textAlign = 'center';
+        c.fillStyle = 'white';
+        c.shadowColor = 'rgba(0,0,0,0.6)';
+        c.shadowBlur = 4;
+        c.fillText(state.playerName, this.x - camX, this.y - this.height / 2 - 12);
+        c.restore();
+      }
+    };
+
+    /* =========================================================
+       8. LEVEL DESIGN & PLATFORMS
+       ========================================================= */
+    let currentLevelData = null;
+
+    function buildLevel(levelNum) {
+      if (levelNum === 1) {
+        return {
+          worldWidth: 2600,
+          bgGradient: ['#60A5FA', '#93C5FD', '#E0F2FE'],
+          platforms: [
+            // Starting ground
+            { x: 0, y: 520, w: 500, h: 80, type: 'grass' },
+            // Floating stepping stones
+            { x: 550, y: 440, w: 180, h: 30, type: 'stone' },
+            { x: 780, y: 370, w: 200, h: 30, type: 'stone' },
+            { x: 1040, y: 450, w: 220, h: 30, type: 'stone' },
+            // Middle checkpoint ground
+            { x: 1320, y: 520, w: 420, h: 80, type: 'grass' },
+            // Higher platforms leading to portal
+            { x: 1800, y: 420, w: 190, h: 30, type: 'stone' },
+            { x: 2050, y: 350, w: 200, h: 30, type: 'stone' },
+            // Goal arena
+            { x: 2300, y: 500, w: 400, h: 100, type: 'grass' }
+          ],
+          crystals: [
+            { x: 640, y: 390, collected: false, qIndex: 0 },
+            { x: 880, y: 320, collected: false, qIndex: 1 },
+            { x: 1500, y: 460, collected: false, isMinigame: true }, // Mini-game trigger!
+            { x: 2150, y: 300, collected: false, qIndex: 2 }
+          ],
+          bossPortal: { x: 2500, y: 440, w: 70, h: 100 }
+        };
+      } else {
+        // Level 2
+        return {
+          worldWidth: 2800,
+          bgGradient: ['#8B5CF6', '#C084FC', '#F3E8FF'],
+          platforms: [
+            { x: 0, y: 520, w: 450, h: 80, type: 'grass' },
+            { x: 520, y: 450, w: 170, h: 30, type: 'stone' },
+            { x: 760, y: 380, w: 190, h: 30, type: 'stone' },
+            { x: 1020, y: 320, w: 180, h: 30, type: 'stone' },
+            { x: 1280, y: 480, w: 400, h: 80, type: 'grass' },
+            { x: 1740, y: 410, w: 180, h: 30, type: 'stone' },
+            { x: 1990, y: 340, w: 200, h: 30, type: 'stone' },
+            { x: 2260, y: 420, w: 180, h: 30, type: 'stone' },
+            { x: 2500, y: 500, w: 450, h: 100, type: 'grass' }
+          ],
+          crystals: [
+            { x: 600, y: 400, collected: false, qIndex: 3 },
+            { x: 1110, y: 270, collected: false, qIndex: 4 },
+            { x: 1480, y: 420, collected: false, isMinigame: true }, // Mini-game 2!
+            { x: 2090, y: 290, collected: false, qIndex: 5 }
+          ],
+          bossPortal: { x: 2700, y: 440, w: 70, h: 100 }
+        };
+      }
+    }
+
+    /* =========================================================
+       9. DRAWING ROUTINES (SCENERY, CRYSTALS, PORTAL)
+       ========================================================= */
+    function drawBackground(c, camX) {
+      // Dynamic sky gradient
+      const grad = c.createLinearGradient(0, 0, 0, canvas.height);
+      grad.addColorStop(0, currentLevelData.bgGradient[0]);
+      grad.addColorStop(0.6, currentLevelData.bgGradient[1]);
+      grad.addColorStop(1, currentLevelData.bgGradient[2]);
+      c.fillStyle = grad;
+      c.fillRect(0, 0, canvas.width, canvas.height);
+
+      // Parallax soft clouds
+      c.save();
+      c.fillStyle = 'rgba(255, 255, 255, 0.6)';
+      for (let i = 0; i < 6; i++) {
+        const cloudX = ((i * 450 - camX * 0.25) % (canvas.width + 300)) - 100;
+        const cloudY = 70 + (i % 3) * 45;
+        c.beginPath();
+        c.arc(cloudX, cloudY, 32, 0, Math.PI * 2);
+        c.arc(cloudX + 25, cloudY - 12, 40, 0, Math.PI * 2);
+        c.arc(cloudX + 55, cloudY, 34, 0, Math.PI * 2);
+        c.fill();
+      }
+      c.restore();
+
+      // Distant rolling hills
+      c.save();
+      c.fillStyle = 'rgba(16, 185, 129, 0.25)';
+      c.beginPath();
+      c.moveTo(0, canvas.height);
+      for (let x = 0; x <= canvas.width; x += 50) {
+        const y = canvas.height - 180 + Math.sin((x + camX * 0.1) * 0.005) * 50;
+        c.lineTo(x, y);
+      }
+      c.lineTo(canvas.width, canvas.height);
+      c.closePath();
+      c.fill();
+      c.restore();
+    }
+
+    function drawPlatforms(c, camX) {
+      for (const p of currentLevelData.platforms) {
+        if (p.x + p.w < camX - 50 || p.x > camX + canvas.width + 50) continue;
+
+        if (p.type === 'grass') {
+          // Lush grass platform
+          c.fillStyle = '#10B981';
+          c.beginPath();
+          c.roundRect(p.x - camX, p.y, p.w, p.h, [16, 16, 0, 0]);
+          c.fill();
+
+          // Soil layer below
+          c.fillStyle = '#78350F';
+          c.fillRect(p.x - camX, p.y + 16, p.w, p.h - 16);
+
+          // Grass blades trim
+          c.fillStyle = '#34D399';
+          for (let gx = p.x; gx < p.x + p.w; gx += 20) {
+            c.beginPath();
+            c.moveTo(gx - camX, p.y);
+            c.lineTo(gx - camX + 10, p.y - 8);
+            c.lineTo(gx - camX + 20, p.y);
+            c.fill();
+          }
+        } else {
+          // Floating magical stone platform
+          const stoneGrad = c.createLinearGradient(0, p.y, 0, p.y + p.h);
+          stoneGrad.addColorStop(0, '#6366F1');
+          stoneGrad.addColorStop(1, '#4338CA');
+          c.fillStyle = stoneGrad;
+
+          c.beginPath();
+          c.roundRect(p.x - camX, p.y, p.w, p.h, 12);
+          c.fill();
+
+          // Edge highlight
+          c.strokeStyle = '#A5B4FC';
+          c.lineWidth = 3;
+          c.stroke();
+
+          // Magical runes dot
+          c.fillStyle = '#E0E7FF';
+          c.beginPath();
+          c.arc(p.x - camX + p.w / 2, p.y + p.h / 2, 4, 0, Math.PI * 2);
+          c.fill();
+        }
+      }
+    }
+
+    function drawCrystals(c, camX) {
+      const now = Date.now();
+      for (const crystal of currentLevelData.crystals) {
+        if (crystal.collected) continue;
+
+        // Floating hover animation
+        const floatY = crystal.y + Math.sin(now / 220 + crystal.x) * 8;
+
+        c.save();
+        c.translate(crystal.x - camX, floatY);
+
+        // Glow ring
+        c.strokeStyle = crystal.isMinigame ? 'rgba(245, 158, 11, 0.4)' : 'rgba(59, 130, 246, 0.4)';
+        c.lineWidth = 4;
+        c.beginPath();
+        c.arc(0, 0, 24, 0, Math.PI * 2);
+        c.stroke();
+
+        // Crystal Emoji
+        c.font = '30px sans-serif';
+        c.textAlign = 'center';
+        c.textBaseline = 'middle';
+        c.fillText(crystal.isMinigame ? '🧩' : '💎', 0, 0);
+
+        c.restore();
+      }
+    }
+
+    function drawBossPortal(c, camX) {
+      const portal = currentLevelData.bossPortal;
+      const now = Date.now();
+
+      c.save();
+      c.translate(portal.x - camX + portal.w / 2, portal.y + portal.h / 2);
+
+      // Pulsing magic vortex
+      const pulse = Math.sin(now / 250) * 6;
+      c.fillStyle = 'rgba(239, 68, 68, 0.25)';
+      c.beginPath();
+      c.ellipse(0, 0, portal.w / 2 + 10 + pulse, portal.h / 2 + 14 + pulse, 0, 0, Math.PI * 2);
+      c.fill();
+
+      // Gate pillars
+      c.fillStyle = '#4C1D95';
+      c.fillRect(-portal.w / 2, -portal.h / 2, 14, portal.h);
+      c.fillRect(portal.w / 2 - 14, -portal.h / 2, 14, portal.h);
+
+      // Portal icon
+      c.font = '38px sans-serif';
+      c.textAlign = 'center';
+      c.textBaseline = 'middle';
+      c.fillText('👾', 0, 0);
+
+      // Text above portal
+      c.font = 'bold 13px var(--font-cute)';
+      c.fillStyle = '#FEE2E2';
+      c.fillText('ด่านบอสไวรัส!', 0, -portal.h / 2 - 14);
+
+      c.restore();
+    }
+
+    /* =========================================================
+       10. GAME LOGIC & INTERACTION
+       ========================================================= */
+    function showFloatingText(text, x, y, color = '#F59E0B') {
+      const el = document.createElement('div');
+      el.className = 'floating-text';
+      el.textContent = text;
+      el.style.left = `${x}px`;
+      el.style.top = `${y}px`;
+      el.style.color = color;
+      document.getElementById('game-wrapper').appendChild(el);
+      setTimeout(() => el.remove(), 800);
+    }
+
+    function updateHUD() {
+      document.getElementById('hud-name').textContent = state.playerName;
+      document.getElementById('hud-avatar').textContent = state.playerAvatar;
+      document.getElementById('hud-level').textContent = `${state.currentLevel}/${state.totalLevels}`;
+      document.getElementById('hud-crystals').textContent = `${state.crystalsCollected}/${state.crystalsRequired}`;
+      document.getElementById('hud-score').textContent = state.score;
+
+      // Hearts
+      let heartsStr = '';
+      for (let i = 0; i < 3; i++) {
+        heartsStr += i < state.lives ? '❤️' : '🖤';
+      }
+      document.getElementById('hud-hearts').textContent = heartsStr;
+    }
+
+    function handleFallPit() {
+      state.lives--;
+      sound.playWrong();
+      updateHUD();
+
+      if (state.lives <= 0) {
+        triggerGameOver();
+      } else {
+        // Respawn at safe start
+        player.reset(80, 400);
+        player.invulnerableTimer = 60;
+        showFloatingText('ระวังตกเหว! -1 ❤️', canvas.width / 2 - 60, canvas.height / 2, '#EF4444');
+      }
+    }
+
+    function checkCrystalCollisions() {
+      for (const crystal of currentLevelData.crystals) {
+        if (crystal.collected) continue;
+
+        const dist = Math.hypot(player.x - crystal.x, player.y - crystal.y);
+        if (dist < 40) {
+          // Collected!
+          crystal.collected = true;
+          state.crystalsCollected++;
+          state.score += 50;
+          sound.playCrystal();
+          updateHUD();
+
+          // Spawn burst particles
+          for (let i = 0; i < 14; i++) {
+            particles.push(new Particle(crystal.x, crystal.y, crystal.isMinigame ? '#F59E0B' : '#38BDF8', (Math.random() - 0.5) * 6, (Math.random() - 0.5) * 6, 5));
+          }
+
+          showFloatingText('+50 ⭐', crystal.x - camera.x, crystal.y - 20);
+
+          // Pause and trigger Question or Mini-game
+          if (crystal.isMinigame) {
+            setTimeout(() => triggerMinigame(), 350);
+          } else {
+            const q = QUESTION_BANK[state.questionCursor % QUESTION_BANK.length];
+            state.questionCursor++;
+            setTimeout(() => triggerQuestionModal(q), 350);
+          }
+          break;
+        }
+      }
+
+      // Check Boss portal collision
+      const portal = currentLevelData.bossPortal;
+      if (
+        player.x > portal.x &&
+        player.x < portal.x + portal.w &&
+        player.y > portal.y &&
+        player.y < portal.y + portal.h
+      ) {
+        if (state.crystalsCollected >= state.crystalsRequired) {
+          triggerBossBattle();
+        } else {
+          showFloatingText(`ต้องเก็บคริสตัลให้ครบ ${state.crystalsRequired} เม็ดก่อนนะ! 💎`, canvas.width / 2 - 120, canvas.height / 2, '#F59E0B');
+          player.x = portal.x - 30; // bump back
+        }
+      }
+    }
+
+    /* =========================================================
+       11. PURE HTML/CSS FLOWCHART RENDERER
+       ========================================================= */
+    function renderFlowchartHTML(containerId, fcData) {
+      const container = document.getElementById(containerId);
+      container.innerHTML = '';
+
+      if (!fcData) return;
+
+      // Custom full HTML flowchart if provided
+      if (fcData.customHtml) {
+        container.innerHTML = fcData.customHtml;
+        return;
+      }
+
+      // Flowgorithm Header Badge
+      html += `
+        <div class="fg-badge">
+          <span>⚡ Flowgorithm Diagram</span>
+        </div>
+      `;
+
+      // Main / Start pill
+      if (fcData.main || fcData.start) {
+        const label = fcData.main || fcData.start;
+        html += `<div class="fg-main">${label}</div><div class="fc-arrow-down"></div>`;
+      }
+
+      // Declare box
+      if (fcData.declare) {
+        const decls = Array.isArray(fcData.declare) ? fcData.declare : [fcData.declare];
+        decls.forEach(d => {
+          html += `<div class="fg-declare">${d}</div><div class="fc-arrow-down"></div>`;
+        });
+      }
+
+      // Input box
+      if (fcData.input) {
+        const inputs = Array.isArray(fcData.input) ? fcData.input : [fcData.input];
+        inputs.forEach(inp => {
+          html += `<div class="fg-input-box"><span>${inp}</span></div><div class="fc-arrow-down"></div>`;
+        });
+      }
+
+      // Assign box
+      if (fcData.assign) {
+        const assigns = Array.isArray(fcData.assign) ? fcData.assign : [fcData.assign];
+        assigns.forEach(asg => {
+          html += `<div class="fg-assign">${asg}</div><div class="fc-arrow-down"></div>`;
+        });
+      }
+
+      // Decision diamond
+      if (fcData.decision) {
+        html += `
+          <div class="fc-decision-wrapper">
+            <div class="fc-decision-diamond" style="background: #FFF7ED; border-color: #F97316;"></div>
+            <div class="fc-decision-text" style="color: #9A3412;">${fcData.decision}</div>
+          </div>
+        `;
+      }
+
+      // Branches (True / False)
+      if (fcData.trueBranch || fcData.falseBranch) {
+        html += `
+          <div class="fc-branches">
+            <div class="fc-branch-col">
+              <span class="fc-branch-label fc-branch-true">True (จริง) ↓</span>
+              <div class="fg-output-box" style="margin-top: 4px;">
+                <span>${fcData.trueBranch || ''}</span>
+              </div>
+            </div>
+            <div class="fc-branch-col">
+              <span class="fc-branch-label fc-branch-false">False (เท็จ) ↓</span>
+              <div class="fg-output-box" style="margin-top: 4px; background: #FEF2F2; border-color: #EF4444; color: #991B1B;">
+                <span>${fcData.falseBranch || ''}</span>
+              </div>
+            </div>
+          </div>
+        `;
+      }
+
+      // End pill
+      if (fcData.end) {
+        html += `
+          <div class="fc-arrow-down" style="margin-top: 8px;"></div>
+          <div class="fg-end" style="margin-top: 2px;">${fcData.end}</div>
+        `;
+      }
+
+      // Optional Code Preview
+      if (fcData.codePreview) {
+        html += `
+          <div style="margin-top: 10px; background: #0F172A; color: #38BDF8; padding: 6px 12px; border-radius: 8px; font-family: 'Consolas', monospace; font-size: 0.8rem; text-align: left; width: 100%; max-width: 440px; border: 1px solid #334155;">
+            <span style="color: #94A3B8;">// Flowgorithm Pseudocode:</span><br>
+            ${fcData.codePreview}
+          </div>
+        `;
+      }
+
+      container.innerHTML = html;
+    }
+
+    /* =========================================================
+       12. QUESTION MODAL CONTROLLER
+       ========================================================= */
+    function triggerQuestionModal(questionObj) {
+      state.isPaused = true;
+      state.activeQuestion = questionObj;
+
+      renderFlowchartHTML('flowchart-area', questionObj.flowchart);
+      document.getElementById('question-text').textContent = questionObj.scenario;
+
+      const choicesBox = document.getElementById('choices-container');
+      choicesBox.innerHTML = '';
+
+      const explanationBox = document.getElementById('answer-explanation');
+      explanationBox.className = 'answer-explanation';
+      explanationBox.style.display = 'none';
+
+      document.getElementById('question-actions').style.display = 'none';
+
+      const labels = ['A', 'B', 'C', 'D'];
+      questionObj.choices.forEach((choice, idx) => {
+        const btn = document.createElement('button');
+        btn.className = 'choice-btn';
+        btn.innerHTML = `
+          <div class="choice-badge">${labels[idx]}</div>
+          <div style="flex: 1;">${choice.text}</div>
+        `;
+
+        btn.onclick = () => handleChoiceSelect(btn, choice, questionObj);
+        choicesBox.appendChild(btn);
+      });
+
+      document.getElementById('question-modal').classList.remove('hidden');
+    }
+
+    function handleChoiceSelect(buttonEl, choiceObj, questionObj) {
+      // Disable all choice buttons once clicked
+      const allBtns = document.querySelectorAll('#choices-container .choice-btn');
+      allBtns.forEach(b => (b.disabled = true));
+
+      const explanationBox = document.getElementById('answer-explanation');
+
+      if (choiceObj.correct) {
+        buttonEl.classList.add('correct');
+        explanationBox.className = 'answer-explanation correct';
+        explanationBox.innerHTML = `🎉 <strong>ถูกต้องจ้า!</strong> ${questionObj.explanation}`;
+        state.score += 100;
+        sound.playCorrect();
+        triggerConfetti(50);
+      } else {
+        buttonEl.classList.add('wrong');
+        // highlight correct choice
+        allBtns.forEach((b, i) => {
+          if (questionObj.choices[i].correct) b.classList.add('correct');
+        });
+        explanationBox.className = 'answer-explanation wrong';
+        explanationBox.innerHTML = `❌ <strong>ยังไม่ถูกต้องนะ:</strong> ${questionObj.explanation}`;
+        state.lives--;
+        sound.playWrong();
+        player.vx = -7; // knockback!
+      }
+
+      updateHUD();
+      explanationBox.style.display = 'block';
+      document.getElementById('question-actions').style.display = 'block';
+    }
+
+    document.getElementById('btn-next-question').addEventListener('click', () => {
+      sound.playClick();
+      document.getElementById('question-modal').classList.add('hidden');
+      state.isPaused = false;
+
+      if (state.lives <= 0) {
+        triggerGameOver();
+      }
+    });
+
+    /* =========================================================
+       13. MINI-GAME: REORDER FLOWCHART STEPS
+       ========================================================= */
+    let minigameCurrentIndex = 0;
+    let minigameSourceList = [];
+    let minigameTargetList = [];
+
+    function triggerMinigame() {
+      state.isPaused = true;
+      const scenario = MINIGAME_SCENARIOS[minigameCurrentIndex % MINIGAME_SCENARIOS.length];
+
+      document.getElementById('minigame-mission').textContent = scenario.mission;
+      document.getElementById('minigame-feedback').style.display = 'none';
+      document.getElementById('btn-minigame-continue').classList.add('hidden');
+      document.getElementById('btn-minigame-check').style.display = 'inline-flex';
+      document.getElementById('btn-minigame-reset').style.display = 'inline-flex';
+
+      minigameSourceList = [...scenario.pool];
+      minigameTargetList = [];
+
+      renderMinigameBoards();
+      document.getElementById('minigame-modal').classList.remove('hidden');
+    }
+
+    function renderMinigameBoards() {
+      const sourceZone = document.getElementById('minigame-source-pool');
+      const targetZone = document.getElementById('minigame-target-slots');
+
+      sourceZone.innerHTML = '';
+      targetZone.innerHTML = '';
+
+      if (minigameSourceList.length === 0) {
+        sourceZone.innerHTML = '<div style="color: #94A3B8; font-size: 0.9rem;">(นำขั้นตอนไปเรียงในผังงานหมดแล้ว)</div>';
+      } else {
+        minigameSourceList.forEach((item, idx) => {
+          const card = document.createElement('div');
+          card.className = 'step-card';
+          card.innerHTML = `
+            <span>${item}</span>
+            <span style="color: #6366F1; font-weight: 700;">+ เลือก</span>
+          `;
+          card.onclick = () => {
+            sound.playClick();
+            minigameTargetList.push(minigameSourceList.splice(idx, 1)[0]);
+            renderMinigameBoards();
+          };
+          sourceZone.appendChild(card);
+        });
+      }
+
+      if (minigameTargetList.length === 0) {
+        targetZone.innerHTML = '<div style="color: #94A3B8; font-size: 0.9rem;">(คลิกขั้นตอนด้านบน เพื่อนำมาวางในผังงานที่นี่)</div>';
+      } else {
+        minigameTargetList.forEach((item, idx) => {
+          const card = document.createElement('div');
+          card.className = 'step-card active-choice';
+          card.innerHTML = `
+            <span><strong>ขั้นที่ ${idx + 1}:</strong> ${item}</span>
+            <span style="color: #EF4444; font-weight: 700;">✕ นำออก</span>
+          `;
+          card.onclick = () => {
+            sound.playClick();
+            minigameSourceList.push(minigameTargetList.splice(idx, 1)[0]);
+            renderMinigameBoards();
+          };
+          targetZone.appendChild(card);
+
+          if (idx < minigameTargetList.length - 1) {
+            const arrow = document.createElement('div');
+            arrow.className = 'fc-arrow-down';
+            targetZone.appendChild(arrow);
+          }
+        });
+      }
+    }
+
+    document.getElementById('btn-minigame-reset').addEventListener('click', () => {
+      sound.playClick();
+      const scenario = MINIGAME_SCENARIOS[minigameCurrentIndex % MINIGAME_SCENARIOS.length];
+      minigameSourceList = [...scenario.pool];
+      minigameTargetList = [];
+      document.getElementById('minigame-feedback').style.display = 'none';
+      renderMinigameBoards();
+    });
+
+    document.getElementById('btn-minigame-check').addEventListener('click', () => {
+      sound.playClick();
+      const scenario = MINIGAME_SCENARIOS[minigameCurrentIndex % MINIGAME_SCENARIOS.length];
+      const feedback = document.getElementById('minigame-feedback');
+
+      if (minigameTargetList.length < scenario.correctOrder.length) {
+        feedback.className = 'answer-explanation wrong';
+        feedback.textContent = '⚠️ คุณยังวางขั้นตอนไม่ครบทุกกล่องเลย ลองเลือกมาวางให้ครบก่อนนะ!';
+        feedback.style.display = 'block';
+        return;
+      }
+
+      // Validate sequence
+      let isCorrect = true;
+      for (let i = 0; i < scenario.correctOrder.length; i++) {
+        if (minigameTargetList[i] !== scenario.correctOrder[i]) {
+          isCorrect = false;
+          break;
+        }
+      }
+
+      if (isCorrect) {
+        sound.playCorrect();
+        triggerConfetti(60);
+        state.score += 200;
+        updateHUD();
+
+        feedback.className = 'answer-explanation correct';
+        feedback.innerHTML = '🎉 <strong>สุดยอดมาก!</strong> คุณจัดเรียงผังงานได้ถูกต้องสมบูรณ์แบบ ได้รับโบนัส 200 คะแนน!';
+        feedback.style.display = 'block';
+
+        document.getElementById('btn-minigame-check').style.display = 'none';
+        document.getElementById('btn-minigame-reset').style.display = 'none';
+        document.getElementById('btn-minigame-continue').classList.remove('hidden');
+        minigameCurrentIndex++;
+      } else {
+        sound.playWrong();
+        feedback.className = 'answer-explanation wrong';
+        feedback.innerHTML = '❌ <strong>ลำดับยังไม่ถูกต้องจ้า:</strong> ลองสังเกตคำว่า "เริ่มต้น", ขั้นตอนการปฏิบัติ และ "สิ้นสุด" ให้ดี แล้วลองเรียงใหม่อีกครั้งนะ';
+        feedback.style.display = 'block';
+      }
+    });
+
+    document.getElementById('btn-minigame-continue').addEventListener('click', () => {
+      sound.playClick();
+      document.getElementById('minigame-modal').classList.add('hidden');
+      state.isPaused = false;
+    });
+
+    /* =========================================================
+       14. BOSS BATTLE CONTROLLER
+       ========================================================= */
+    function triggerBossBattle() {
+      state.isPaused = true;
+      state.bossActive = true;
+      state.bossHP = 5;
+      state.currentBossQIndex = 0;
+
+      updateBossUI();
+      loadBossQuestion(state.currentBossQIndex);
+
+      document.getElementById('boss-modal').classList.remove('hidden');
+    }
+
+    function updateBossUI() {
+      const fill = document.getElementById('boss-hp-fill');
+      const text = document.getElementById('boss-hp-text');
+      const percent = (state.bossHP / state.bossMaxHP) * 100;
+      fill.style.width = `${Math.max(0, percent)}%`;
+      text.textContent = `HP: ${Math.max(0, state.bossHP)} / ${state.bossMaxHP}`;
+    }
+
+    function loadBossQuestion(idx) {
+      if (idx >= BOSS_QUESTIONS.length) {
+        handleBossVictory();
+        return;
+      }
+
+      const q = BOSS_QUESTIONS[idx];
+      renderFlowchartHTML('boss-flowchart-area', q.flowchart);
+      document.getElementById('boss-question-text').textContent = q.scenario;
+
+      const choicesBox = document.getElementById('boss-choices-container');
+      choicesBox.innerHTML = '';
+
+      const feedback = document.getElementById('boss-feedback');
+      feedback.style.display = 'none';
+      document.getElementById('boss-actions').style.display = 'none';
+
+      const labels = ['1', '2', '3'];
+      q.choices.forEach((choice, cIdx) => {
+        const btn = document.createElement('button');
+        btn.className = 'choice-btn';
+        btn.innerHTML = `
+          <div class="choice-badge">${labels[cIdx]}</div>
+          <div style="flex: 1;">${choice.text}</div>
+        `;
+        btn.onclick = () => handleBossAnswer(btn, choice, q);
+        choicesBox.appendChild(btn);
+      });
+    }
+
+    function handleBossAnswer(btnEl, choiceObj, qObj) {
+      const allBtns = document.querySelectorAll('#boss-choices-container .choice-btn');
+      allBtns.forEach(b => (b.disabled = true));
+
+      const feedback = document.getElementById('boss-feedback');
+      const bossSprite = document.getElementById('boss-sprite');
+      const speech = document.getElementById('boss-speech');
+
+      if (choiceObj.correct) {
+        btnEl.classList.add('correct');
+        sound.playBossHit();
+        state.bossHP--;
+        state.score += 150;
+        updateHUD();
+        updateBossUI();
+
+        // Hit animation on boss
+        bossSprite.classList.add('hit');
+        setTimeout(() => bossSprite.classList.remove('hit'), 450);
+
+        speech.textContent = 'โอ๊ยยย! ตรวจพบและแก้ Bug ใน Flowgorithm ได้เฉียบคมมาก!';
+        feedback.className = 'answer-explanation correct';
+        feedback.innerHTML = `💥 <strong>โจมตีสำเร็จ!</strong> ${qObj.explanation}`;
+        triggerConfetti(35);
+      } else {
+        btnEl.classList.add('wrong');
+        sound.playWrong();
+        state.lives--;
+        updateHUD();
+
+        speech.textContent = 'ฮ่าๆๆ! ติดกับดัก Syntax & Logic Bug ของข้าเข้าแล้ว!';
+        feedback.className = 'answer-explanation wrong';
+        feedback.innerHTML = `❌ <strong>บอสป้องกันได้:</strong> ${qObj.explanation}`;
+      }
+
+      feedback.style.display = 'block';
+      document.getElementById('boss-actions').style.display = 'block';
+    }
+
+    document.getElementById('btn-boss-next').addEventListener('click', () => {
+      sound.playClick();
+      if (state.lives <= 0) {
+        document.getElementById('boss-modal').classList.add('hidden');
+        triggerGameOver();
+        return;
+      }
+
+      if (state.bossHP <= 0) {
+        handleBossVictory();
+      } else {
+        state.currentBossQIndex++;
+        loadBossQuestion(state.currentBossQIndex);
+      }
+    });
+
+    function handleBossVictory() {
+      sound.playVictory();
+      triggerConfetti(120);
+
+      document.getElementById('boss-modal').classList.add('hidden');
+
+      if (state.currentLevel < state.totalLevels) {
+        // Next Level!
+        state.currentLevel++;
+        state.crystalsCollected = 0;
+        currentLevelData = buildLevel(state.currentLevel);
+        player.reset(80, 400);
+        updateHUD();
+        state.isPaused = false;
+        showFloatingText(`🎉 ยินดีด้วย! ผ่านเข้าสู่ด่านที่ ${state.currentLevel}!`, canvas.width / 2 - 120, canvas.height / 2, '#10B981');
+      } else {
+        // Win Complete Game!
+        triggerGameWin();
+      }
+    }
+
+    /* =========================================================
+       15. GAME OVER & WIN MODALS
+       ========================================================= */
+    function triggerGameOver() {
+      state.isPaused = true;
+      sound.playGameOver();
+      document.getElementById('game-over-modal').classList.remove('hidden');
+    }
+
+    document.getElementById('btn-restart-game').addEventListener('click', () => {
+      sound.playClick();
+      document.getElementById('game-over-modal').classList.add('hidden');
+      resetGameFull();
+    });
+
+    function triggerGameWin() {
+      state.isPaused = true;
+      sound.playVictory();
+      triggerConfetti(150);
+
+      document.getElementById('win-player-name').textContent = state.playerName;
+      document.getElementById('win-final-score').textContent = state.score;
+      document.getElementById('win-modal').classList.remove('hidden');
+    }
+
+    document.getElementById('btn-play-again').addEventListener('click', () => {
+      sound.playClick();
+      document.getElementById('win-modal').classList.add('hidden');
+      resetGameFull();
+    });
+
+    function resetGameFull() {
+      state.lives = 3;
+      state.score = 0;
+      state.currentLevel = 1;
+      state.crystalsCollected = 0;
+      state.questionCursor = 0;
+      currentLevelData = buildLevel(1);
+      player.reset(80, 400);
+      updateHUD();
+      state.isPaused = false;
+    }
+
+    /* =========================================================
+       16. USER CONTROLS (KEYBOARD + TOUCH)
+       ========================================================= */
+    // Keyboard
+    window.addEventListener('keydown', e => {
+      sound.init(); // initialize Web Audio on first keypress
+      if (e.key === 'ArrowLeft' || e.key === 'a' || e.key === 'A') state.keys.left = true;
+      if (e.key === 'ArrowRight' || e.key === 'd' || e.key === 'D') state.keys.right = true;
+      if (e.key === 'ArrowUp' || e.key === 'w' || e.key === 'W' || e.key === ' ') {
+        state.keys.jump = true;
+        e.preventDefault();
+      }
+    });
+
+    window.addEventListener('keyup', e => {
+      if (e.key === 'ArrowLeft' || e.key === 'a' || e.key === 'A') state.keys.left = false;
+      if (e.key === 'ArrowRight' || e.key === 'd' || e.key === 'D') state.keys.right = false;
+      if (e.key === 'ArrowUp' || e.key === 'w' || e.key === 'W' || e.key === ' ') state.keys.jump = false;
+    });
+
+    // Touch controls helper
+    function setupTouchButton(id, keyName) {
+      const btn = document.getElementById(id);
+      const start = e => {
+        e.preventDefault();
+        sound.init();
+        state.keys[keyName] = true;
+        btn.classList.add('active');
+      };
+      const end = e => {
+        e.preventDefault();
+        state.keys[keyName] = false;
+        btn.classList.remove('active');
+      };
+
+      btn.addEventListener('touchstart', start, { passive: false });
+      btn.addEventListener('touchend', end, { passive: false });
+      btn.addEventListener('mousedown', start);
+      btn.addEventListener('mouseup', end);
+      btn.addEventListener('mouseleave', end);
+    }
+
+    setupTouchButton('btn-left', 'left');
+    setupTouchButton('btn-right', 'right');
+    setupTouchButton('btn-jump', 'jump');
+
+    // Mute button
+    document.getElementById('btn-sound-toggle').addEventListener('click', () => {
+      const isAudible = sound.toggleMute();
+      document.getElementById('btn-sound-toggle').textContent = isAudible ? '🔊' : '🔇';
+    });
+
+    // Avatar Selection in Start Screen
+    const avatarCards = document.querySelectorAll('.avatar-option');
+    avatarCards.forEach(card => {
+      card.addEventListener('click', () => {
+        sound.init();
+        sound.playClick();
+        avatarCards.forEach(c => c.classList.remove('selected'));
+        card.classList.add('selected');
+        state.playerAvatar = card.dataset.avatar;
+      });
+    });
+
+    // Start Button
+    document.getElementById('btn-start-game').addEventListener('click', () => {
+      sound.init();
+      sound.playClick();
+
+      const nameInput = document.getElementById('player-name-input').value.trim();
+      if (nameInput) state.playerName = nameInput;
+
+      document.getElementById('start-screen').classList.add('hidden');
+      document.getElementById('hud').style.display = 'flex';
+      document.getElementById('mobile-controls').style.display = 'flex';
+
+      resizeCanvases();
+      currentLevelData = buildLevel(1);
+      player.reset(80, 400);
+      updateHUD();
+      state.gameStarted = true;
+    });
+
+    /* =========================================================
+       17. MAIN GAME LOOP
+       ========================================================= */
+    function gameLoop() {
+      requestAnimationFrame(gameLoop);
+
+      // Update & Draw Confetti always
+      confCtx.clearRect(0, 0, confCanvas.width, confCanvas.height);
+      for (let i = confettiList.length - 1; i >= 0; i--) {
+        const c = confettiList[i];
+        c.update();
+        c.draw(confCtx);
+        if (c.y > confCanvas.height + 20) {
+          confettiList.splice(i, 1);
+        }
+      }
+
+      if (!state.gameStarted) return;
+
+      if (!state.isPaused) {
+        // Physics & movement
+        player.update(currentLevelData.platforms);
+
+        // Update Camera target smoothly
+        const targetCamX = player.x - canvas.width * 0.35;
+        camera.x += (targetCamX - camera.x) * 0.1;
+        camera.x = Math.max(0, Math.min(currentLevelData.worldWidth - canvas.width, camera.x));
+
+        // Collisions
+        checkCrystalCollisions();
+
+        // Particles
+        for (let i = particles.length - 1; i >= 0; i--) {
+          const p = particles[i];
+          p.update();
+          if (p.life <= 0) {
+            particles.splice(i, 1);
+          }
+        }
+      }
+
+      // Render World
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      drawBackground(ctx, camera.x);
+      drawPlatforms(ctx, camera.x);
+      drawCrystals(ctx, camera.x);
+      drawBossPortal(ctx, camera.x);
+
+      // Render Particles
+      for (const p of particles) {
+        p.draw(ctx, camera.x);
+      }
+
+      // Render Player
+      player.draw(ctx, camera.x);
+    }
+
+    // Initialize layout on load
+    window.onload = () => {
+      resizeCanvases();
+      gameLoop();
+    };
+  </script>
+</body>
+</html>
